@@ -51,7 +51,7 @@ with result_handler:
         content = file['content']
         if file['name'].endswith(".pdf"):
             content = "\n\n".join(file['content'])
-        chunks.extend(util.convert_to_chunks(content, chunk_size=500))
+        chunks.extend(util.convert_to_chunks(content, chunk_size=st.session_state['CHUNK_SIZE']))
 
     token_usage = GPT.misc.predict_token(st.session_state['OPENAI_PARAMS'], chunks)
     st.markdown(f"Price Prediction: `${token_usage * 0.000002}` || Token Usage: `{token_usage}`")
@@ -65,7 +65,6 @@ with result_handler:
         if API_KEY and GPT.misc.validate_api_key(API_KEY):
             if file_contents:
                 st.success("👍API key is valid")
-
 
                 with st.spinner("Summarizing... (this might take a while)"):
                     responses, finish_reason_rec = util.recursive_summarize(chunks)
