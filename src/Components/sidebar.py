@@ -41,7 +41,7 @@ def sidebar():
                                height=120)
 
         with st.expander('🔥 Advanced Options'):
-            chunk_size = st.slider('Chunk Size (word count)', min_value=0, max_value=2500, value=500, step=20)
+            chunk_size = st.slider('Chunk Size (word count)', min_value=0, max_value=2500, value=800, step=20)
             max_tokens_single = st.slider('Max Tokens Summary', min_value=0, max_value=4090, value=650, step=20)
             max_tokens_rec = st.slider('Max Tokens Chunks', min_value=0, max_value=4090, value=250, step=20)
             temperature = st.slider('Temperature', min_value=0.0, max_value=1.0, step=0.05, value=0.7)

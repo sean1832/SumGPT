@@ -54,9 +54,9 @@ with result_handler:
         chunks.extend(util.convert_to_chunks(content, chunk_size=st.session_state['CHUNK_SIZE']))
 
     token_usage = GPT.misc.predict_token(st.session_state['OPENAI_PARAMS'], chunks)
-    st.markdown(f"Price Prediction: `${token_usage * 0.000002}` || Token Usage: `{token_usage}`")
+    st.markdown(f"Price Prediction: `${round(token_usage * 0.000002, 5)}` || Token Usage: `{token_usage}`")
 
-    with st.expander("Chunks"):
+    with st.expander(f"Chunks ({len(chunks)})"):
         for chunk in chunks:
             st.write(chunk)
 
