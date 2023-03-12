@@ -8,3 +8,4 @@ PyPDF4==1.27.0
 python_docx==0.8.11
 streamlit==1.20.0
 streamlit_toggle_switch==1.0.2
+tiktoken==0.3.0
