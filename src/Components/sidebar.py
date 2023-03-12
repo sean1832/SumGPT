@@ -42,9 +42,10 @@ def sidebar():
                                         'Make sure to use casual language.',
                                    height=140)
             persona_sum = st.text_area('Bot Persona Total Sum',
-                                       value='You are a comprehensive summarizer provide detail explanation of a large chunk'
-                                             ' of text into detailed paragraphs with perfect english while making sure all '
-                                             'the key points are included.',
+                                       value='You are a comprehensive summarizer provide detail explanation of the '
+                                             'following large chunk of text into comprehensive and cohesive '
+                                             'paragraphs of article with perfect english while making sure all the key points '
+                                             'are included. Make sure that the text can read fluently and make sense.',
                                        help='This is a pre-defined message for total summarization that is used to'
                                             'instruct the assistant at the beginning of a conversation. ',
                                        height=140)
