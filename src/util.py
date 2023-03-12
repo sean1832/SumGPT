@@ -61,7 +61,7 @@ def convert_to_chunks(content: str, chunk_size: int = 1000, enable_embedding: bo
             embedding = openAIEmbeddings(st.session_state["OPENAI_API_KEY"])
             chunks.append({'content': chunk, 'vector': embedding.embedding(chunk)})
         else:
-            chunks.append({'content': chunk, 'vector': None, 'language_based': language_base(chunk)})
+            chunks.append({'content': chunk, 'language_based': language_base(chunk)})
     return chunks
 
 
