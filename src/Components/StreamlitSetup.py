@@ -18,3 +18,6 @@ def setup():
 
     if not st.session_state.get('OPENAI_PARAMS'):
         st.session_state['OPENAI_PARAMS'] = None
+
+    if not st.session_state.get('DELAY'):
+        st.session_state['DELAY'] = 0

@@ -6,7 +6,7 @@ import re
 import GPT
 import textwrap
 from langdetect import detect
-
+import time
 
 def similarity(v1, v2) -> np.ndarray:
     """Returns the cosine similarity between two vectors."""
@@ -94,6 +94,7 @@ def recursive_summarize(chunks: List[Dict[str, float]]) -> Tuple[List[str], str]
         recursiveSumTexts.append(text)
         progress_bar.progress((count + 1) / chunks_length)
         count += 1
+        time.sleep(st.session_state['DELAY'])
     return recursiveSumTexts, finish_reason
 
 
