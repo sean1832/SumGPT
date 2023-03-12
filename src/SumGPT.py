@@ -70,6 +70,6 @@ with result_handler:
                     st.warning(
                         '⚠️Result cut off due to length. Consider increasing the [Max Tokens Summary] parameter.')
             else:
-                st.error("❌Please upload a file.")
+                st.error("❌ Please upload a file to continue.")
         else:
-            st.error("❌Please enter a valid [OpenAI API key](https://beta.openai.com/account/api-keys).")
+            st.error("❌ Please enter a valid [OpenAI API key](https://beta.openai.com/account/api-keys).")

@@ -14,7 +14,7 @@ def similarity(v1, v2) -> np.ndarray:
 def _chunk_spliter(content: str, chunk_size: int = 1000) -> List[str]:
     """Splits a string into chunks of a given size."""
 
-    sentences = re.split(r'(?<=[.?!])\s+', content)
+    sentences = re.split(r'(?<=[.?!,。，、！？·])\s+', content)
     chunks = []
     chunk = ''
     word_count = 0
