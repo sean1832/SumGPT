@@ -1,3 +1,4 @@
 from Components import sidebar
-
-__all__ = ['sidebar']
+from Components import StreamlitSetup
+from Components import Info
+__all__ = ['sidebar', 'StreamlitSetup', 'Info']

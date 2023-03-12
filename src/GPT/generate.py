@@ -3,6 +3,7 @@ import streamlit as st
 import GPT.param
 from typing import Any, Dict, List, Tuple, Union
 
+
 def get_answer_stream(content: str):
     """Returns a stream of responses from the OpenAI API."""
     params = st.session_state["OPENAI_PARAMS"]
@@ -36,7 +37,7 @@ def get_answer_stream(content: str):
         response_panel.info(answer)
 
 
-def get_answer(content: str, recursive: bool) -> Tuple[str, str]:
+def get_answer(content: str, recursive: bool, persona: str) -> Tuple[str, str]:
     """Returns a response from the OpenAI API."""
     params = st.session_state["OPENAI_PARAMS"]
     if recursive:
@@ -44,7 +45,7 @@ def get_answer(content: str, recursive: bool) -> Tuple[str, str]:
     else:
         max_tokens = params.max_tokens_single
     bot = GPT.bot.OpenAIChatBot(st.session_state["OPENAI_API_KEY"],
-                                st.session_state["OPENAI_PERSONA"],
+                                persona,
                                 params.model,
                                 max_tokens,
                                 params.temperature,

@@ -1,13 +1,15 @@
 import streamlit as st
 import GPT
-
+from streamlit_toggle import st_toggle_switch
+import Components
 
 def set_openai_api_key(api_key: str):
     st.session_state["OPENAI_API_KEY"] = api_key
 
 
-def set_openai_persona(persona: str):
-    st.session_state["OPENAI_PERSONA"] = persona
+def set_openai_persona(persona_rec: str, persona_sum: str):
+    st.session_state["OPENAI_PERSONA_REC"] = persona_rec
+    st.session_state["OPENAI_PERSONA_SUM"] = persona_sum
 
 
 def set_param(params: GPT.param):
@@ -16,6 +18,10 @@ def set_param(params: GPT.param):
 
 def set_chunk_size(size: int):
     st.session_state['CHUNK_SIZE'] = size
+
+
+def set_delay(time: int):
+    st.session_state['DELAY'] = time
 
 
 def sidebar():
@@ -31,14 +37,29 @@ def sidebar():
                                   type="password",
                                   help="You can get your API key from https://beta.openai.com/account/api-keys")
 
-        persona = st.text_area('🤖 Bot Persona',
-                               value='You are a comprehensive summarizer that summarise large chunk of text '
-                                     'into detailed paragraphs with perfect english while making sure all '
-                                     'the key points are included.',
-                               help='System message is a pre-defined message used to instruct the assistant at the '
-                                    'beginning of a conversation. iterating and '
-                                    'experimenting with potential improvements can help to generate better outputs.',
-                               height=120)
+        if st_toggle_switch(label="Delay (free openAI API user)", default_value=False):
+            delay = st.slider('Delay (seconds)', min_value=0, max_value=5, value=1, step=1)
+        else:
+            delay = 0
+
+        with st.expander('🤖 Bot Persona'):
+            persona_rec = st.text_area('Bot Persona Recursive',
+                                       value='You are a comprehensive summarizer that summarise large chunk of text '
+                                             'into detailed paragraphs with perfect english while making sure all '
+                                             'the key points are included. ',
+                                       help='System message is a pre-defined message used to instruct the assistant at the '
+                                            'beginning of a conversation. iterating and '
+                                            'experimenting with potential improvements can help to generate better outputs.'
+                                            'Make sure to use casual language.',
+                                       height=140)
+            persona_sum = st.text_area('Bot Persona Total Sum',
+                                       value='You are a comprehensive summarizer provide detail explanation of the '
+                                             'following large chunk of text into comprehensive and cohesive '
+                                             'paragraphs of article with perfect english while making sure all the key points '
+                                             'are included. Make sure that the text can read fluently and make sense.',
+                                       help='This is a pre-defined message for total summarization that is used to'
+                                            'instruct the assistant at the beginning of a conversation. ',
+                                       height=140)
 
         with st.expander('🔥 Advanced Options'):
             chunk_size = st.slider('Chunk Size (word count)', min_value=0, max_value=2500, value=800, step=20)
@@ -59,11 +80,14 @@ def sidebar():
                 presence_penalty=presence_penalty
             )
 
+        Components.Info.info()
+
         if api_input:
             set_openai_api_key(api_input)
 
-        if persona:
-            set_openai_persona(persona)
+        if persona_rec:
+            set_openai_persona(persona_rec, persona_sum)
 
         set_chunk_size(chunk_size)
         set_param(param)
+        set_delay(delay)
