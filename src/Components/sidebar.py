@@ -3,6 +3,7 @@ import GPT
 from streamlit_toggle import st_toggle_switch
 import Components
 
+
 def set_openai_api_key(api_key: str):
     st.session_state["OPENAI_API_KEY"] = api_key
 

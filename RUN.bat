@@ -1,4 +1,13 @@
 @echo off
+set VENV_NAME=venv
+
+if not exist %VENV_NAME% (
+    echo Creating virtual environment %VENV_NAME%...
+    python -m venv %VENV_NAME%
+)
+
+echo Virtual environment %VENV_NAME% is ready.
+
 echo Activating Virtural environment!
 call .\venv\Scripts\activate
 
