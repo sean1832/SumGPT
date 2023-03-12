@@ -71,7 +71,7 @@ def recursive_summarize(chunks: List[Dict[str, float]]) -> Tuple[List[str], str]
     progress_bar = st.progress(0)
     for chunk in chunks:
         content = chunk['content']
-        text, finish_reason = GPT.generate.get_answer(content, recursive=True)
+        text, finish_reason = GPT.generate.get_answer(content, recursive=True, persona=st.session_state['OPENAI_PERSONA_REC'])
         recursiveSumTexts.append(text)
         progress_bar.progress((count + 1) / chunks_length)
         count += 1
@@ -81,6 +81,6 @@ def recursive_summarize(chunks: List[Dict[str, float]]) -> Tuple[List[str], str]
 def summarize(recursive_sum: List[str]) -> Tuple[str, str]:
     """Returns a summary of the given content."""
     join_sum = ' '.join(recursive_sum)
-    answer, finish_reason = GPT.generate.get_answer(join_sum, recursive=False)
+    answer, finish_reason = GPT.generate.get_answer(join_sum, recursive=False, persona=st.session_state['OPENAI_PERSONA_SUM'])
     return answer, finish_reason
 

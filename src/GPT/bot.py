@@ -44,6 +44,6 @@ class OpenAIChatBot:
             presence_penalty=self.presence_penalty,
             messages=[
                 {"role": "system", "content": self.persona},
-                {"role": "user", "content": prompt}
+                {"role": "user", "content": f"{self.persona} '{prompt}'"}
             ])
         return completions['choices'][0]['message']['content'], completions['choices'][0]['finish_reason']
