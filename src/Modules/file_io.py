@@ -4,7 +4,14 @@ import docx
 from typing import Any, Dict, List, Tuple, Union
 from pydub import AudioSegment
 import math
+import json
 
+
+def read_json(file, key: str) -> Any:
+    """Reads a json file and returns the value of a key."""
+    with open(file, "r") as f:
+        data = json.load(f)
+    return data[key]
 
 
 def read_txt(file, encoding: str = "utf-8") -> str:

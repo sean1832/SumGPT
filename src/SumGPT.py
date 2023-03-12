@@ -7,14 +7,21 @@ import util
 
 Components.StreamlitSetup.setup()
 
+app_header = st.container()
+
 file_handler = st.container()
 content_handler = st.container()
 result_handler = st.container()
 
+with app_header:
+    st.title("📝 SumGPT")
+    st.markdown("##### Summarize your text with OpenAI's GPT-3.5 API")
+    st.markdown("##### [GitHub repo](https://github.com/sean1832/SumGPT)")
+
 sidebar()
 
 with file_handler:
-    uploaded_files = st.file_uploader("Upload your files", type=['txt', 'pdf', 'docx', 'md'],
+    uploaded_files = st.file_uploader("📁 Upload your files", type=['txt', 'pdf', 'docx', 'md'],
                                       accept_multiple_files=True)
     file_contents = []
     with st.spinner("🔍 Reading files... (mp3 files might take a while)"):

@@ -1,7 +1,7 @@
 import streamlit as st
 import GPT
 from streamlit_toggle import st_toggle_switch
-
+import Components
 
 def set_openai_api_key(api_key: str):
     st.session_state["OPENAI_API_KEY"] = api_key
@@ -79,6 +79,8 @@ def sidebar():
                 frequency_penalty=frequency_penalty,
                 presence_penalty=presence_penalty
             )
+
+        Components.Info.info()
 
         if api_input:
             set_openai_api_key(api_input)
