@@ -1,25 +1,11 @@
+import Components
 import streamlit as st
 from Components.sidebar import sidebar
 import Modules.file_io as file_io
 import GPT
 import util
 
-st.set_page_config(page_title="SumGPT", page_icon="📝", layout="wide")
-
-if not st.session_state.get('OPENAI_API_KEY'):
-    st.session_state['OPENAI_API_KEY'] = None
-
-if not st.session_state.get('OPENAI_PERSONA_REC'):
-    st.session_state['OPENAI_PERSONA_REC'] = None
-
-if not st.session_state.get('OPENAI_PERSONA_SUM'):
-    st.session_state['OPENAI_PERSONA_SUM'] = None
-
-if not st.session_state.get('CHUNK_SIZE'):
-    st.session_state['CHUNK_SIZE'] = None
-
-if not st.session_state.get('OPENAI_PARAMS'):
-    st.session_state['OPENAI_PARAMS'] = None
+Components.StreamlitSetup.setup()
 
 file_handler = st.container()
 content_handler = st.container()
