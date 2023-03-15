@@ -4,6 +4,7 @@ from Components.sidebar import sidebar
 import Modules.file_io as file_io
 import GPT
 import util
+from datetime import datetime
 
 Components.StreamlitSetup.setup()
 
@@ -91,14 +92,16 @@ with result_handler:
                             '⚠️Result cut off due to length. Consider increasing the [Max Tokens Summary] parameter.')
 
                 joint_rec_response = f"=====recursive responses=====\n\n" + '\n\n'.join(rec_responses)
+
+                now = datetime.now()
                 if final_response is not None:
                     st.download_button("Download Summary",
                                        f"{joint_rec_response}\n\n======final response=====\n\n{final_response}",
-                                       file_name="summary.txt")
+                                       file_name=f"summary_{now.strftime('%Y-%m-%d_%H-%M')}.txt")
                 else:
                     st.download_button("📥 Download Summary",
                                        joint_rec_response,
-                                       file_name="summary.txt")
+                                       file_name=f"summary_{now.strftime('%Y-%m-%d_%H-%M')}.txt")
 
             else:
                 st.error("❌ Please upload a file to continue.")
