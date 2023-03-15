@@ -91,8 +91,11 @@ def sidebar():
                                    value=_set_config(config_file, "CHUNK_SIZE", 800))
             max_tokens_rec = st.slider('Max Tokens - Recursive Summary', min_value=0, max_value=4090, step=20,
                                        value=_set_config(config_file, "MAX_TOKENS_REC", 250))
-            max_tokens_final = st.slider('Max Tokens - Final Summary', min_value=0, max_value=4090, step=20,
-                                         value=_set_config(config_file, "MAX_TOKENS_FINAL", 650))
+            if enable_final_summary:
+                max_tokens_final = st.slider('Max Tokens - Final Summary', min_value=0, max_value=4090, step=20,
+                                             value=_set_config(config_file, "MAX_TOKENS_FINAL", 650))
+            else:
+                max_tokens_final = 0
             temperature = st.slider('Temperature', min_value=0.0, max_value=1.0, step=0.05,
                                     value=_set_config(config_file, "TEMPERATURE", 0.7))
             top_p = st.slider('Top P', min_value=0.0, max_value=1.0, step=0.05,
