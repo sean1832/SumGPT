@@ -64,7 +64,7 @@ with result_handler:
                 with st.spinner("Summarizing... (this might take a while)"):
                     rec_responses, finish_reason_rec = util.recursive_summarize(chunks)
                     if st.session_state['FINAL_SUMMARY_MODE']:
-                        final_response, finish_reason_single = util.summarize(rec_responses)
+                        final_response, finish_reason_final = util.summarize(rec_responses)
                     else:
                         final_response = None
 
@@ -77,7 +77,7 @@ with result_handler:
                 if st.session_state['FINAL_SUMMARY_MODE']:
                     st.header("📝Summary")
                     st.info(final_response)
-                    if finish_reason_single == 'length':
+                    if finish_reason_final == 'length':
                         st.warning(
                             '⚠️Result cut off due to length. Consider increasing the [Max Tokens Summary] parameter.')
 

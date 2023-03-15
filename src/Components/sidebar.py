@@ -85,7 +85,7 @@ def sidebar():
                 delay = 0
             param = GPT.param.gpt_param(
                 model=model,
-                max_tokens_single=max_tokens_single,
+                max_tokens_final=max_tokens_single,
                 max_tokens_rec=max_tokens_rec,
                 temperature=temperature,
                 top_p=top_p,

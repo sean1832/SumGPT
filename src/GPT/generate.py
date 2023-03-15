@@ -43,7 +43,7 @@ def get_answer(content: str, recursive: bool, persona: str) -> Tuple[str, str]:
     if recursive:
         max_tokens = params.max_tokens_rec
     else:
-        max_tokens = params.max_tokens_single
+        max_tokens = params.max_tokens_final
     bot = GPT.bot.OpenAIChatBot(st.session_state["OPENAI_API_KEY"],
                                 persona,
                                 params.model,
