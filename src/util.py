@@ -95,6 +95,7 @@ def recursive_summarize(chunks: List[Dict[str, float]]) -> Tuple[List[str], str]
         progress_bar.progress((count + 1) / chunks_length)
         count += 1
         time.sleep(st.session_state['DELAY'])
+
     return recursiveSumTexts, finish_reason
 
 

@@ -25,6 +25,10 @@ def set_delay(time: int):
     st.session_state['DELAY'] = time
 
 
+def set_final_summary_mode(mode: bool):
+    st.session_state['FINAL_SUMMARY_MODE'] = mode
+
+
 def sidebar():
     with st.sidebar:
         st.markdown("## How to use\n"
@@ -38,10 +42,12 @@ def sidebar():
                                   type="password",
                                   help="You can get your API key from https://beta.openai.com/account/api-keys")
 
-        if st_toggle_switch(label="Delay (free openAI API user)", default_value=False):
-            delay = st.slider('Delay (seconds)', min_value=0, max_value=5, value=1, step=1)
-        else:
-            delay = 0
+        enable_final_summary = st_toggle_switch(label="Enable Final Summary", default_value=False)
+        if enable_final_summary:
+            set_final_summary_mode(True)
+        if st.session_state['FINAL_SUMMARY_MODE'] != enable_final_summary:
+            set_final_summary_mode(enable_final_summary)
+            st.experimental_rerun()
 
         with st.expander('🤖 Bot Persona'):
             persona_rec = st.text_area('Bot Persona Recursive',
@@ -53,14 +59,17 @@ def sidebar():
                                             'experimenting with potential improvements can help to generate better outputs.'
                                             'Make sure to use casual language.',
                                        height=140)
-            persona_sum = st.text_area('Bot Persona Total Sum',
-                                       value='You are a comprehensive summarizer provide detail explanation of the '
-                                             'following large chunk of text into comprehensive and cohesive '
-                                             'paragraphs of article with perfect english while making sure all the key points '
-                                             'are included. Make sure that the text can read fluently and make sense.',
-                                       help='This is a pre-defined message for total summarization that is used to'
-                                            'instruct the assistant at the beginning of a conversation. ',
-                                       height=140)
+            if enable_final_summary:
+                persona_sum = st.text_area('Bot Persona Total Sum',
+                                           value='You are a comprehensive summarizer provide detail explanation of the '
+                                                 'following large chunk of text into comprehensive and cohesive '
+                                                 'paragraphs of article with perfect english while making sure all the key points '
+                                                 'are included. Make sure that the text can read fluently and make sense.',
+                                           help='This is a pre-defined message for total summarization that is used to'
+                                                'instruct the assistant at the beginning of a conversation. ',
+                                           height=140)
+            else:
+                persona_sum = ""
 
         with st.expander('🔥 Advanced Options'):
             chunk_size = st.slider('Chunk Size (word count)', min_value=0, max_value=2500, value=800, step=20)
@@ -71,6 +80,10 @@ def sidebar():
             frequency_penalty = st.slider('Frequency Penalty', min_value=0.0, max_value=2.0, step=0.1)
             presence_penalty = st.slider('Presence Penalty', min_value=0.0, max_value=2.0, step=0.1)
             model = st.selectbox("Model", options=['gpt-3.5-turbo', 'gpt-3.5-turbo-0301'])
+            if st_toggle_switch(label="Delay (free openAI API user)", default_value=False):
+                delay = st.slider('Delay (seconds)', min_value=0, max_value=5, value=1, step=1)
+            else:
+                delay = 0
             param = GPT.param.gpt_param(
                 model=model,
                 max_tokens_single=max_tokens_single,

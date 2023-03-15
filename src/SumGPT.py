@@ -61,21 +61,24 @@ with result_handler:
         if API_KEY and GPT.misc.validate_api_key(API_KEY):
             if file_contents:
                 st.success("👍API key is valid")
-                print(f'delay: {st.session_state["DELAY"]}')
+
                 with st.spinner("Summarizing... (this might take a while)"):
                     responses, finish_reason_rec = util.recursive_summarize(chunks)
-                    response, finish_reason_single = util.summarize(responses)
+                    if st.session_state['FINAL_SUMMARY_MODE']:
+                        response, finish_reason_single = util.summarize(responses)
 
                 with st.expander("Recursive Summaries"):
-                    st.write(responses)
+                    for response in responses:
+                        st.info(response)
                 if finish_reason_rec == 'length':
                     st.warning('⚠️Result cut off due to length. Consider increasing the [Max Tokens Chunks] parameter.')
 
-                st.header("📝Summary")
-                st.info(response)
-                if finish_reason_single == 'length':
-                    st.warning(
-                        '⚠️Result cut off due to length. Consider increasing the [Max Tokens Summary] parameter.')
+                if st.session_state['FINAL_SUMMARY_MODE']:
+                    st.header("📝Summary")
+                    st.info(response)
+                    if finish_reason_single == 'length':
+                        st.warning(
+                            '⚠️Result cut off due to length. Consider increasing the [Max Tokens Summary] parameter.')
             else:
                 st.error("❌ Please upload a file to continue.")
         else:
