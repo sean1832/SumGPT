@@ -51,9 +51,9 @@ def sidebar():
 
         with st.expander('🤖 Bot Persona'):
             persona_rec = st.text_area('Bot Persona Recursive',
-                                       value='You are a comprehensive summarizer that summarise large chunk of text '
-                                             'into detailed paragraphs with perfect english while making sure all '
-                                             'the key points are included. ',
+                                       value='Summarize following content in a detail '
+                                             'and comprehensive way in perfect english with no grammar issue while '
+                                             'making sure all the key points are included.',
                                        help='System message is a pre-defined message used to instruct the assistant at the '
                                             'beginning of a conversation. iterating and '
                                             'experimenting with potential improvements can help to generate better outputs.'
@@ -61,7 +61,7 @@ def sidebar():
                                        height=140)
             if enable_final_summary:
                 persona_sum = st.text_area('Bot Persona Total Sum',
-                                           value='You are a comprehensive summarizer provide detail explanation of the '
+                                           value='Provide detail explanation and summary of the '
                                                  'following large chunk of text into comprehensive and cohesive '
                                                  'paragraphs of article with perfect english while making sure all the key points '
                                                  'are included. Make sure that the text can read fluently and make sense.',

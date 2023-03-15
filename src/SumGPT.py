@@ -63,22 +63,35 @@ with result_handler:
                 st.success("👍API key is valid")
 
                 with st.spinner("Summarizing... (this might take a while)"):
-                    responses, finish_reason_rec = util.recursive_summarize(chunks)
+                    rec_responses, finish_reason_rec = util.recursive_summarize(chunks)
                     if st.session_state['FINAL_SUMMARY_MODE']:
-                        response, finish_reason_single = util.summarize(responses)
+                        final_response, finish_reason_single = util.summarize(rec_responses)
+                    else:
+                        final_response = None
 
-                with st.expander("Recursive Summaries"):
-                    for response in responses:
+                with st.expander("Recursive Summaries", expanded=not st.session_state['FINAL_SUMMARY_MODE']):
+                    for response in rec_responses:
                         st.info(response)
                 if finish_reason_rec == 'length':
                     st.warning('⚠️Result cut off due to length. Consider increasing the [Max Tokens Chunks] parameter.')
 
                 if st.session_state['FINAL_SUMMARY_MODE']:
                     st.header("📝Summary")
-                    st.info(response)
+                    st.info(final_response)
                     if finish_reason_single == 'length':
                         st.warning(
                             '⚠️Result cut off due to length. Consider increasing the [Max Tokens Summary] parameter.')
+
+                joint_rec_response = f"=====recursive responses=====\n\n" + '\n\n'.join(rec_responses)
+                if final_response is not None:
+                    st.download_button("Download Summary",
+                                       f"{joint_rec_response}\n\n======final response=====\n\n{final_response}",
+                                       file_name="summary.txt")
+                else:
+                    st.download_button("📥 Download Summary",
+                                       joint_rec_response,
+                                       file_name="summary.txt")
+
             else:
                 st.error("❌ Please upload a file to continue.")
         else:
