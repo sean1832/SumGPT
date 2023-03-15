@@ -21,12 +21,21 @@ with app_header:
 sidebar()
 
 with file_handler:
-    uploaded_files = st.file_uploader("📁 Upload your files", type=['txt', 'pdf', 'docx', 'md'],
-                                      accept_multiple_files=True)
     file_contents = []
-    with st.spinner("🔍 Reading files... (mp3 files might take a while)"):
-        for file in uploaded_files:
-            file_contents.append({'name': file.name, 'content': file_io.read(file)})
+    youtube_link = st.text_input(label="🔗 YouTube Link",
+                                 placeholder="Enter your YouTube link",
+                                 help="Enter your YouTube link to download the video and extract the audio")
+    if youtube_link:
+        with st.spinner("🔍 Extracting transcript..."):
+            transcript, title = util.extract_youtube_transcript(youtube_link)
+            file_contents.append({'name': f"{title}.txt", 'content': transcript})
+
+    if not youtube_link:
+        uploaded_files = st.file_uploader("📁 Upload your files", type=['txt', 'pdf', 'docx', 'md'],
+                                          accept_multiple_files=True)
+        with st.spinner("🔍 Reading files... (mp3 files might take a while)"):
+            for file in uploaded_files:
+                file_contents.append({'name': file.name, 'content': file_io.read(file)})
 with content_handler:
     if file_contents:
         with st.expander("File Preview"):
