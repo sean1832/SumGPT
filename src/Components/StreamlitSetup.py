@@ -21,3 +21,6 @@ def setup():
 
     if not st.session_state.get('DELAY'):
         st.session_state['DELAY'] = 0
+
+    if not st.session_state.get('FINAL_SUMMARY_MODE'):
+        st.session_state['FINAL_SUMMARY_MODE'] = False

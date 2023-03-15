@@ -30,7 +30,9 @@ def predict_token(param, chunks) -> int:
             chunk_token = llm.get_num_tokens(chunk['content'])
             chunk_token += param.max_tokens_rec
             total_token += chunk_token
-        total_token += param.max_tokens_single
+        if st.session_state['FINAL_SUMMARY_MODE']:
+            total_token += param.max_tokens_final
+
         return total_token
     else:
         return 0

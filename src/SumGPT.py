@@ -21,13 +21,21 @@ with app_header:
 sidebar()
 
 with file_handler:
-    uploaded_files = st.file_uploader("📁 Upload your files", type=['txt', 'pdf', 'docx', 'md'],
-                                      accept_multiple_files=True)
     file_contents = []
-    with st.spinner("🔍 Reading files... (mp3 files might take a while)"):
-        for file in uploaded_files:
-            file_contents.append({'name': file.name, 'content': file_io.read(file)})
+    youtube_link = st.text_input(label="🔗 YouTube Link",
+                                 placeholder="Enter your YouTube link",
+                                 help="Enter your YouTube link to download the video and extract the audio")
+    if youtube_link:
+        with st.spinner("🔍 Extracting transcript..."):
+            transcript, title = util.extract_youtube_transcript(youtube_link)
+            file_contents.append({'name': f"{title}.txt", 'content': transcript})
 
+    if not youtube_link:
+        uploaded_files = st.file_uploader("📁 Upload your files", type=['txt', 'pdf', 'docx', 'md'],
+                                          accept_multiple_files=True)
+        with st.spinner("🔍 Reading files... (mp3 files might take a while)"):
+            for file in uploaded_files:
+                file_contents.append({'name': file.name, 'content': file_io.read(file)})
 with content_handler:
     if file_contents:
         with st.expander("File Preview"):
@@ -61,21 +69,37 @@ with result_handler:
         if API_KEY and GPT.misc.validate_api_key(API_KEY):
             if file_contents:
                 st.success("👍API key is valid")
-                print(f'delay: {st.session_state["DELAY"]}')
-                with st.spinner("Summarizing... (this might take a while)"):
-                    responses, finish_reason_rec = util.recursive_summarize(chunks)
-                    response, finish_reason_single = util.summarize(responses)
 
-                with st.expander("Recursive Summaries"):
-                    st.write(responses)
+                with st.spinner("Summarizing... (this might take a while)"):
+                    rec_responses, finish_reason_rec = util.recursive_summarize(chunks)
+                    if st.session_state['FINAL_SUMMARY_MODE']:
+                        final_response, finish_reason_final = util.summarize(rec_responses)
+                    else:
+                        final_response = None
+
+                with st.expander("Recursive Summaries", expanded=not st.session_state['FINAL_SUMMARY_MODE']):
+                    for response in rec_responses:
+                        st.info(response)
                 if finish_reason_rec == 'length':
                     st.warning('⚠️Result cut off due to length. Consider increasing the [Max Tokens Chunks] parameter.')
 
-                st.header("📝Summary")
-                st.info(response)
-                if finish_reason_single == 'length':
-                    st.warning(
-                        '⚠️Result cut off due to length. Consider increasing the [Max Tokens Summary] parameter.')
+                if st.session_state['FINAL_SUMMARY_MODE']:
+                    st.header("📝Summary")
+                    st.info(final_response)
+                    if finish_reason_final == 'length':
+                        st.warning(
+                            '⚠️Result cut off due to length. Consider increasing the [Max Tokens Summary] parameter.')
+
+                joint_rec_response = f"=====recursive responses=====\n\n" + '\n\n'.join(rec_responses)
+                if final_response is not None:
+                    st.download_button("Download Summary",
+                                       f"{joint_rec_response}\n\n======final response=====\n\n{final_response}",
+                                       file_name="summary.txt")
+                else:
+                    st.download_button("📥 Download Summary",
+                                       joint_rec_response,
+                                       file_name="summary.txt")
+
             else:
                 st.error("❌ Please upload a file to continue.")
         else:

@@ -7,6 +7,9 @@ import GPT
 import textwrap
 from langdetect import detect
 import time
+from pytube import YouTube
+import xml.etree.ElementTree as ET
+
 
 def similarity(v1, v2) -> np.ndarray:
     """Returns the cosine similarity between two vectors."""
@@ -14,16 +17,51 @@ def similarity(v1, v2) -> np.ndarray:
 
 
 def language_base(string: str):
-    lang_code = detect(string)
-    latin_based = ['en', 'fr-ca', 'es']
-    east_asian_based = ['zh', 'ja', 'ko']
-    for lang in latin_based:
-        if lang_code.startswith(lang):
-            return 'latin'
-    for lang in east_asian_based:
-        if lang_code.startswith(lang):
-            return 'east_asian'
-    return 'other'
+    try:
+        lang_code = detect(string)
+        latin_based = ['en', 'fr-ca', 'es']
+        east_asian_based = ['zh', 'ja', 'ko']
+        for lang in latin_based:
+            if lang_code.startswith(lang):
+                return 'latin'
+        for lang in east_asian_based:
+            if lang_code.startswith(lang):
+                return 'east_asian'
+        return 'other'
+    except:
+        return 'other'
+
+
+def _extract_xml_caption(xml: str) -> str:
+    """Extracts the text content from the <s> elements of an XML string."""
+    root = ET.fromstring(xml)
+    text_content = ''
+    for child in root.iter('s'):
+        text_content += child.text
+    return text_content.strip()
+
+
+def _get_caption(url: str, lang_code: str = 'a.en') -> str:
+    """Extracts the transcript from a YouTube video."""
+    yt = YouTube(url)
+    try:
+        caption = yt.captions[lang_code]
+        xml_caption = caption.xml_captions
+        caption_string = _extract_xml_caption(xml_caption)
+    except KeyError:
+        st.error('❌ No captions found for this video.')
+        caption_string = ''
+
+    return caption_string
+
+
+def extract_youtube_transcript(url: str, lang_code: str = 'a.en') -> Tuple[str, str]:
+    """Extracts the transcript from a YouTube video."""
+
+    youtube = YouTube(url)
+    title = youtube.title
+    transcript = _get_caption(url, lang_code)
+    return transcript, title
 
 
 def _chunk_spliter(content: str, chunk_size: int = 1000, lang_base: str = 'latin') -> List[str]:
@@ -45,11 +83,27 @@ def _chunk_spliter(content: str, chunk_size: int = 1000, lang_base: str = 'latin
                 chunks.append(chunk.strip())
                 chunk = sentence
                 word_count = sentence_word_count
+        # add the last chunk
         if chunk:
             chunks.append(chunk.strip())
+
+        new_chunks = []
+        for c in chunks:
+            if c == '':
+                continue
+            if len(c.split()) > chunk_size + 25:
+                words = c.split()
+                small_chunks = []
+                for i in range(0, len(words), chunk_size):
+                    small_chunks.append(' '.join(words[i:i+chunk_size]))
+                new_chunks.extend(small_chunks)
+            else:
+                new_chunks.append(c)
+        return new_chunks
+
     else:
         chunks = textwrap.wrap(content, width=chunk_size)
-    return chunks
+        return chunks
 
 
 def convert_to_chunks(content: str, chunk_size: int = 1000, enable_embedding: bool = False) -> List[Dict[str, float]]:
@@ -95,6 +149,7 @@ def recursive_summarize(chunks: List[Dict[str, float]]) -> Tuple[List[str], str]
         progress_bar.progress((count + 1) / chunks_length)
         count += 1
         time.sleep(st.session_state['DELAY'])
+
     return recursiveSumTexts, finish_reason
 
 
