@@ -9,9 +9,10 @@ import json
 
 def read_json(file, key: str) -> Any:
     """Reads a json file and returns the value of a key."""
-    with open(file, "r") as f:
-        data = json.load(f)
-    return data[key]
+    if not isinstance(file, str):
+        f = file.getvalue().decode("utf-8")
+        data = json.loads(f)
+        return data[key]
 
 
 def read_txt(file, encoding: str = "utf-8") -> str:
