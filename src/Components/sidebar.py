@@ -47,7 +47,6 @@ def sidebar():
             set_final_summary_mode(True)
         if st.session_state['FINAL_SUMMARY_MODE'] != enable_final_summary:
             set_final_summary_mode(enable_final_summary)
-            st.experimental_rerun()
 
         with st.expander('🤖 Bot Persona'):
             persona_rec = st.text_area('Bot Persona Recursive',

@@ -27,7 +27,6 @@ with file_handler:
     with st.spinner("🔍 Reading files... (mp3 files might take a while)"):
         for file in uploaded_files:
             file_contents.append({'name': file.name, 'content': file_io.read(file)})
-
 with content_handler:
     if file_contents:
         with st.expander("File Preview"):
