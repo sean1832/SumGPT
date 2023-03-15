@@ -44,9 +44,15 @@ def _extract_xml_caption(xml: str) -> str:
 def _get_caption(url: str, lang_code: str = 'a.en') -> str:
     """Extracts the transcript from a YouTube video."""
     yt = YouTube(url)
-    caption = yt.captions[lang_code]
-    xml_caption = caption.xml_captions
-    return _extract_xml_caption(xml_caption)
+    try:
+        caption = yt.captions[lang_code]
+        xml_caption = caption.xml_captions
+        caption_string = _extract_xml_caption(xml_caption)
+    except KeyError:
+        st.error('❌ No captions found for this video.')
+        caption_string = ''
+
+    return caption_string
 
 
 def extract_youtube_transcript(url: str, lang_code: str = 'a.en') -> Tuple[str, str]:
