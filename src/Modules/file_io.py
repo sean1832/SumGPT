@@ -9,6 +9,13 @@ import json
 
 def read_json(file, key: str) -> Any:
     """Reads a json file and returns the value of a key."""
+    with open(file, "r") as f:
+        data = json.load(f)
+        return data[key]
+
+
+def read_json_upload(file, key: str) -> Any:
+    """Reads a json file and returns the value of a key."""
     if not isinstance(file, str):
         f = file.getvalue().decode("utf-8")
         data = json.loads(f)

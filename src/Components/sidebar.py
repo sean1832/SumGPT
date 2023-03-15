@@ -33,7 +33,7 @@ def set_final_summary_mode(mode: bool):
 
 def _set_config(config_file, key: str, default_value):
     if config_file:
-        return file_io.read_json(config_file, key)
+        return file_io.read_json_upload(config_file, key)
     else:
         return default_value
 
