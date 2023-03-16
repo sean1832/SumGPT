@@ -22,53 +22,55 @@ with app_header:
 sidebar()
 
 with file_handler:
-    file_contents = []
-    youtube_link = st.text_input(label="🔗 YouTube Link",
-                                 placeholder="Enter your YouTube link",
-                                 help="Enter your YouTube link to download the video and extract the audio")
+    youtube_link_empty = st.empty()
+    upload_file_emtpy = st.empty()
+    youtube_link = youtube_link_empty.text_input(label="🔗 YouTube Link",
+                                                 placeholder="Enter your YouTube link",
+                                                 help="Enter your YouTube link to download the video and extract the audio")
+    upload_file = upload_file_emtpy.file_uploader("📁 Upload your file", type=['txt', 'pdf', 'docx', 'md'])
     if youtube_link:
+        upload_file_emtpy.empty()
         with st.spinner("🔍 Extracting transcript..."):
             transcript, title = util.extract_youtube_transcript(youtube_link)
-            file_contents.append({'name': f"{title}.txt", 'content': transcript})
+            file_content = {'name': f"{title}.txt", 'content': transcript}
+    elif upload_file:
+        youtube_link_empty.empty()
+        with st.spinner("🔍 Reading file... (mp3 file might take a while)"):
+            file_content = {'name': upload_file.name, 'content': file_io.read(upload_file)}
+    elif youtube_link and upload_file:
+        st.warning("Please only upload one file at a time")
+    else:
+        file_content = None
 
-    if not youtube_link:
-        uploaded_files = st.file_uploader("📁 Upload your files", type=['txt', 'pdf', 'docx', 'md'],
-                                          accept_multiple_files=True)
-        with st.spinner("🔍 Reading files... (mp3 files might take a while)"):
-            for file in uploaded_files:
-                file_contents.append({'name': file.name, 'content': file_io.read(file)})
 with content_handler:
-    if file_contents:
+    if file_content:
         with st.expander("File Preview"):
-            for file in file_contents:
-                if file['name'].endswith(".pdf"):
-                    file_content = "\n\n".join(file['content'])
-                    st.text_area(file['name'], file_content, height=200)
-                else:
-                    file_content = file['content']
-                    st.text_area(file['name'], file_content, height=200)
+            if file_content['name'].endswith(".pdf"):
+                content = "\n\n".join(file_content['content'])
+                st.text_area(file_content['name'], content, height=200)
+            else:
+                content = file_content['content']
+                st.text_area(file_content['name'], content, height=200)
 
 with result_handler:
-    run_button = st.button("🚀 Run")
-
-    chunks = []
-    for file in file_contents:
-        content = file['content']
-        if file['name'].endswith(".pdf"):
-            content = "\n\n".join(file['content'])
+    if file_content:
+        run_button = st.button("🚀 Run")
+        chunks = []
+        content = file_content['content']
+        if file_content['name'].endswith(".pdf"):
+            content = "\n\n".join(file_content['content'])
         chunks.extend(util.convert_to_chunks(content, chunk_size=st.session_state['CHUNK_SIZE']))
 
-    token_usage = GPT.misc.predict_token(st.session_state['OPENAI_PARAMS'], chunks)
-    st.markdown(f"Price Prediction: `${round(token_usage * 0.000002, 5)}` || Token Usage: `{token_usage}`")
+        token_usage = GPT.misc.predict_token(st.session_state['OPENAI_PARAMS'], chunks)
+        st.markdown(f"Price Prediction: `${round(token_usage * 0.000002, 5)}` || Token Usage: `{token_usage}`")
 
-    with st.expander(f"Chunks ({len(chunks)})"):
-        for chunk in chunks:
-            st.write(chunk)
+        with st.expander(f"Chunks ({len(chunks)})"):
+            for chunk in chunks:
+                st.write(chunk)
 
-    if run_button:
-        API_KEY = st.session_state['OPENAI_API_KEY']
-        if API_KEY and GPT.misc.validate_api_key(API_KEY):
-            if file_contents:
+        if run_button:
+            API_KEY = st.session_state['OPENAI_API_KEY']
+            if API_KEY and GPT.misc.validate_api_key(API_KEY):
                 st.success("👍API key is valid")
 
                 with st.spinner("Summarizing... (this might take a while)"):
@@ -90,20 +92,6 @@ with result_handler:
                     if finish_reason_final == 'length':
                         st.warning(
                             '⚠️Result cut off due to length. Consider increasing the [Max Tokens Summary] parameter.')
-
-                joint_rec_response = f"=====recursive responses=====\n\n" + '\n\n'.join(rec_responses)
-
-                now = datetime.now()
-                if final_response is not None:
-                    st.download_button("📥 Download Summary",
-                                       f"{joint_rec_response}\n\n======final response=====\n\n{final_response}",
-                                       file_name=f"summary_{now.strftime('%Y-%m-%d_%H-%M')}.txt")
-                else:
-                    st.download_button("📥 Download Summary",
-                                       joint_rec_response,
-                                       file_name=f"summary_{now.strftime('%Y-%m-%d_%H-%M')}.txt")
-
+                util.download_results(rec_responses, final_response)
             else:
-                st.error("❌ Please upload a file to continue.")
-        else:
-            st.error("❌ Please enter a valid [OpenAI API key](https://beta.openai.com/account/api-keys).")
+                st.error("❌ Please enter a valid [OpenAI API key](https://beta.openai.com/account/api-keys).")
