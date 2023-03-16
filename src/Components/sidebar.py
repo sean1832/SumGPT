@@ -42,7 +42,7 @@ def sidebar():
     with st.sidebar:
         st.markdown("## How to use\n"
                     "1. 🔑 Enter your [OpenAI API key](https://beta.openai.com/account/api-keys)\n"
-                    "2. 📁 upload your files (multiple files accepted)\n"
+                    "2. 📁 upload your file\n"
                     "3. 🏃 Run\n"
                     "---")
 

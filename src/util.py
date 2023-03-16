@@ -9,27 +9,7 @@ from langdetect import detect
 import time
 from pytube import YouTube
 import xml.etree.ElementTree as ET
-
-
-def similarity(v1, v2) -> np.ndarray:
-    """Returns the cosine similarity between two vectors."""
-    return np.dot(v1, v2)
-
-
-def language_base(string: str):
-    try:
-        lang_code = detect(string)
-        latin_based = ['en', 'fr-ca', 'es']
-        east_asian_based = ['zh', 'ja', 'ko']
-        for lang in latin_based:
-            if lang_code.startswith(lang):
-                return 'latin'
-        for lang in east_asian_based:
-            if lang_code.startswith(lang):
-                return 'east_asian'
-        return 'other'
-    except KeyError:
-        return 'other'
+from datetime import datetime
 
 
 def _extract_xml_caption(xml: str) -> str:
@@ -55,13 +35,9 @@ def _get_caption(url: str, lang_code: str = 'a.en') -> str:
     return caption_string
 
 
-def extract_youtube_transcript(url: str, lang_code: str = 'a.en') -> Tuple[str, str]:
-    """Extracts the transcript from a YouTube video."""
-
-    youtube = YouTube(url)
-    title = youtube.title
-    transcript = _get_caption(url, lang_code)
-    return transcript, title
+def _similarity(v1, v2) -> np.ndarray:
+    """Returns the cosine similarity between two vectors."""
+    return np.dot(v1, v2)
 
 
 def _chunk_spliter(content: str, chunk_size: int = 1000, lang_base: str = 'latin') -> List[str]:
@@ -95,7 +71,7 @@ def _chunk_spliter(content: str, chunk_size: int = 1000, lang_base: str = 'latin
                 words = c.split()
                 small_chunks = []
                 for i in range(0, len(words), chunk_size):
-                    small_chunks.append(' '.join(words[i:i+chunk_size]))
+                    small_chunks.append(' '.join(words[i:i + chunk_size]))
                 new_chunks.extend(small_chunks)
             else:
                 new_chunks.append(c)
@@ -104,6 +80,31 @@ def _chunk_spliter(content: str, chunk_size: int = 1000, lang_base: str = 'latin
     else:
         chunks = textwrap.wrap(content, width=chunk_size)
         return chunks
+
+
+def language_base(string: str) -> str:
+    try:
+        lang_code = detect(string)
+        latin_based = ['en', 'fr-ca', 'es']
+        east_asian_based = ['zh', 'ja', 'ko']
+        for lang in latin_based:
+            if lang_code.startswith(lang):
+                return 'latin'
+        for lang in east_asian_based:
+            if lang_code.startswith(lang):
+                return 'east_asian'
+        return 'other'
+    except KeyError:
+        return 'other'
+
+
+def extract_youtube_transcript(url: str, lang_code: str = 'a.en') -> Tuple[str, str]:
+    """Extracts the transcript from a YouTube video."""
+
+    youtube = YouTube(url)
+    title = youtube.title
+    transcript = _get_caption(url, lang_code)
+    return transcript, title
 
 
 def convert_to_chunks(content: str, chunk_size: int = 1000, enable_embedding: bool = False) -> List[Dict[str, float]]:
@@ -126,7 +127,7 @@ def search_chunks(query: str, chunks: List[Dict[str, float]], count: int = 1) ->
     points = []
 
     for chunk in chunks:
-        point = similarity(vectors, chunk['vector'])
+        point = _similarity(vectors, chunk['vector'])
         points.append({'content': chunk['content'], 'point': point})
 
     # sort the points in descending order
@@ -159,3 +160,18 @@ def summarize(recursive_sum: List[str]) -> Tuple[str, str]:
     answer, finish_reason = GPT.generate.get_answer(join_sum, recursive=False,
                                                     persona=st.session_state['OPENAI_PERSONA_SUM'])
     return answer, finish_reason
+
+
+def download_results(rec_responses, final_response):
+    """Downloads the results as a txt file."""
+    joint_rec_response = f"=====recursive responses=====\n\n" + '\n\n'.join(rec_responses)
+    joint_final_response = f"{joint_rec_response}\n\n======final response=====\n\n{final_response}"
+    now = datetime.now()
+    if final_response is not None:
+        st.download_button("📥 Download Summary",
+                           joint_final_response,
+                           file_name=f"summary_{now.strftime('%Y-%m-%d_%H-%M')}.txt")
+    else:
+        st.download_button("📥 Download Summary",
+                           joint_rec_response,
+                           file_name=f"summary_{now.strftime('%Y-%m-%d_%H-%M')}.txt")
