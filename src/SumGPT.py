@@ -95,7 +95,7 @@ with result_handler:
 
                 now = datetime.now()
                 if final_response is not None:
-                    st.download_button("Download Summary",
+                    st.download_button("📥 Download Summary",
                                        f"{joint_rec_response}\n\n======final response=====\n\n{final_response}",
                                        file_name=f"summary_{now.strftime('%Y-%m-%d_%H-%M')}.txt")
                 else:

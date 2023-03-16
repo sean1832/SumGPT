@@ -28,7 +28,7 @@ def language_base(string: str):
             if lang_code.startswith(lang):
                 return 'east_asian'
         return 'other'
-    except:
+    except KeyError:
         return 'other'
 
 
