@@ -76,7 +76,7 @@ def sidebar():
                 default_persona_sum = 'Provide detail explanation and summary of the following large chunk of text ' \
                                       'into comprehensive and cohesive paragraphs of article with perfect english ' \
                                       'while making sure all the key points are included. Make sure that the text ' \
-                                      'can be read fluently and make sense.'
+                                      'can be read fluently and make sense. Rephrase the text if needed.'
 
                 persona_sum = st.text_area('Bot Persona Total Sum',
                                            value=_set_config(config_file, "OPENAI_PERSONA_SUM", default_persona_sum),
