@@ -21,8 +21,10 @@ with app_header:
 sidebar()
 
 with file_handler:
+    st.button("🔃 Refresh")
     youtube_link_empty = st.empty()
     upload_file_emtpy = st.empty()
+
     youtube_link = youtube_link_empty.text_input(label="🔗 YouTube Link",
                                                  placeholder="Enter your YouTube link",
                                                  help="Enter your YouTube link to download the video and extract the audio")
