@@ -132,7 +132,7 @@ def language_base(string: str) -> str:
         return 'other'
 
 
-@st.cache_data()
+@st.cache_data(show_spinner=False)
 def extract_youtube_transcript(url: str, lang_code: str | List[str] = 'a.en') -> Tuple[str, str]:
     """Extracts the transcript from a YouTube video."""
 
@@ -143,7 +143,7 @@ def extract_youtube_transcript(url: str, lang_code: str | List[str] = 'a.en') ->
     return transcript, title
 
 
-@st.cache_data()
+@st.cache_data(show_spinner=False)
 def convert_to_chunks(content: str, chunk_size: int = 1000, enable_embedding: bool = False) -> List[Dict[str, float]]:
     """Converts a string into chunks of a given size."""
     chunks_text = _chunk_spliter(content, chunk_size, language_base(content))
@@ -172,7 +172,7 @@ def search_chunks(query: str, chunks: List[Dict[str, float]], count: int = 1) ->
     return ordered[0:count]
 
 
-@st.cache_data()
+@st.cache_data(show_spinner=False)
 def recursive_summarize(chunks: List[Dict[str, Union[str, float]]], max_tokens) -> Tuple[List[str], str]:
     """Returns a recursive summary of the given content."""
     recursiveSumTexts = []
@@ -193,7 +193,7 @@ def recursive_summarize(chunks: List[Dict[str, Union[str, float]]], max_tokens) 
     return recursiveSumTexts, finish_reason
 
 
-@st.cache_data()
+@st.cache_data(show_spinner=False)
 def summarize(message: List[str] | str) -> Tuple[str, str]:
     """Returns a summary of the given content."""
     if isinstance(message, list):
