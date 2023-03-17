@@ -175,3 +175,13 @@ def download_results(rec_responses, final_response):
         st.download_button("📥 Download Summary",
                            joint_rec_response,
                            file_name=f"summary_{now.strftime('%Y-%m-%d_%H-%M')}.txt")
+
+
+def exceeded_token_handler(param, chunks) -> bool:
+    """Handles the case where the user has exceeded the number of tokens."""
+    info = GPT.misc.is_tokens_exceeded(param, chunks, 4096)
+    if info['exceeded']:
+        st.error(info['message'])
+        return True
+    else:
+        return False
