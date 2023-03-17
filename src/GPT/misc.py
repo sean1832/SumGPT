@@ -76,14 +76,14 @@ def is_tokens_exceeded(param, chunks, max_token: int = 4096) -> Dict[str, Union[
     if max(rec_chunks_token) > max_token:
         return {'exceeded': True,
                 'reason': 'recursive',
-                'message': f"`Recursive summary` tokens exceeded. Max tokens allowed: {max_token}. Tokens used: {max(rec_chunks_token)}\n"
+                'message': f"**[ Recursive summary ]** tokens exceeded. Max tokens allowed: {max_token}. Tokens used: {max(rec_chunks_token)}\n"
                            f"(Prompt: {max(rec_chunks_token) - param.max_tokens_rec}, "
                            f"Completion: {param.max_tokens_rec})"}
 
     elif final_chunks_token > max_token and st.session_state['FINAL_SUMMARY_MODE']:
         return {'exceeded': True,
                 'reason': 'final',
-                'message': f"`Final summary` tokens exceeded. Max tokens allowed: {max_token}. Tokens used: {final_chunks_token}\n"
+                'message': f"**[ Final summary ]** tokens exceeded. Max tokens allowed: {max_token}. Tokens used: {final_chunks_token}\n"
                            f"(Prompt: {final_prompt_token}, Completion: {final_completion_token})"}
     else:
         return {'exceeded': False,
