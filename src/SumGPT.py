@@ -30,7 +30,7 @@ with file_handler:
     if youtube_link:
         upload_file_emtpy.empty()
         with st.spinner("🔍 Extracting transcript..."):
-            transcript, title = util.extract_youtube_transcript(youtube_link)
+            transcript, title = util.extract_youtube_transcript(youtube_link, st.session_state['CAPTION_LANGUAGES'])
             file_content = {'name': f"{title}.txt", 'content': transcript}
     elif upload_file:
         youtube_link_empty.empty()

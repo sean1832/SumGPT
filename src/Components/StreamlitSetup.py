@@ -1,5 +1,5 @@
 import streamlit as st
-
+import Data.caption_languages as data
 
 def setup():
     st.set_page_config(page_title="SumGPT", page_icon="📝", layout="wide")
@@ -24,3 +24,6 @@ def setup():
 
     if not st.session_state.get('FINAL_SUMMARY_MODE'):
         st.session_state['FINAL_SUMMARY_MODE'] = False
+
+    if not st.session_state.get('CAPTION_LANGUAGES'):
+        st.session_state['CAPTION_LANGUAGES'] = data.languages + data.auto_languages

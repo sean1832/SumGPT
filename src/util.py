@@ -12,27 +12,61 @@ import xml.etree.ElementTree as ET
 from datetime import datetime
 
 
-def _extract_xml_caption(xml: str) -> str:
+def _is_auto_lang(lang_code: str) -> bool:
+    """Checks if the language code is an auto language."""
+    return lang_code.startswith('a.')
+
+
+def _extract_xml_caption(xml: str, is_auto_lang: bool) -> str:
     """Extracts the text content from the <s> elements of an XML string."""
     root = ET.fromstring(xml)
     text_content = ''
-    for child in root.iter('s'):
-        text_content += child.text
+    if is_auto_lang:
+        for child in root.iter('s'):
+            text_content += child.text
+    else:
+        text = ''
+        for p in root.findall('.//p'):
+            text += p.text + ' '
+        text_content = text
     return text_content.strip()
 
 
-def _get_caption(url: str, lang_code: str = 'a.en') -> str:
+def _get_caption(url: str, lang_code: str | List[str] = 'a.en') -> str:
     """Extracts the transcript from a YouTube video."""
     yt = YouTube(url)
-    try:
-        caption = yt.captions[lang_code]
-        xml_caption = caption.xml_captions
-        caption_string = _extract_xml_caption(xml_caption)
-    except KeyError:
-        st.error('❌ No captions found for this video.')
-        caption_string = ''
+    caption = None
+    selected_lang = None
+    if not isinstance(lang_code, list):
+        lang_code = [lang_code]
+    for lang in lang_code:
+        try:
+            caption = yt.captions[lang]
+            selected_lang = lang
+        except KeyError:
+            continue  # try next language
 
-    return caption_string
+    if caption is None:
+        yt_captions = yt.captions
+        if yt_captions is not None:
+            st.error(f'❌ Caption language currently not supported.\n\n'
+                     f'{yt_captions}')
+        else:
+            st.error(f'❌ No captions found in this video. Please try another one.')
+        st.stop()
+
+    else:
+        xml_caption = caption.xml_captions
+        caption_string = _extract_xml_caption(xml_caption, _is_auto_lang(selected_lang))
+
+        # check if caption parsing failed
+        if xml_caption is not None and caption_string == '':
+            st.error(f'❌ Caption parsing failed. [ url: {url}, lang: {selected_lang} ]\n\n'
+                     f'Please [report this issue on Here](https://github.com/sean1832/SumGPT/issues). '
+                     f'Make sure to copy this error message and include it in your issue.')
+            st.stop()
+
+        return caption_string
 
 
 def _similarity(v1, v2) -> np.ndarray:
@@ -98,10 +132,11 @@ def language_base(string: str) -> str:
         return 'other'
 
 
-def extract_youtube_transcript(url: str, lang_code: str = 'a.en') -> Tuple[str, str]:
+def extract_youtube_transcript(url: str, lang_code: str | List[str] = 'a.en') -> Tuple[str, str]:
     """Extracts the transcript from a YouTube video."""
 
     youtube = YouTube(url)
+    time.sleep(0.3)
     title = youtube.title
     transcript = _get_caption(url, lang_code)
     return transcript, title
