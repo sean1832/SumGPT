@@ -73,16 +73,23 @@ def sidebar():
                                             'Make sure to use casual language.',
                                        height=140)
             if enable_final_summary:
-                default_persona_sum = 'Provide detail explanation and summary of the following large chunk of text ' \
-                                      'into comprehensive and cohesive paragraphs of article with perfect english ' \
-                                      'while making sure all the key points are included. Make sure that the text ' \
-                                      'can be read fluently and make sense. Rephrase the text if needed.'
+                default_persona_sum_a = 'Provide detail explanation and summary of the following text ' \
+                                      'into comprehensive and cohesive article in markdown format with ' \
+                                      'perfect english while making sure all the key points are included. ' \
+                                      'Rephrase and restructure the text so that it can be read fluently, make sense ' \
+                                      'and avoid repetition.' \
+
+                default_persona_sum_b = 'identify five key points in the following text and use them as headings. ' \
+                                        'Use ### headings in markdown. ' \
+                                        'Under headings, provide detail explanation of the concept based on the following text ' \
+                                        'in the way that can be read fluently, make sense and avoid repetition. ' \
+                                        'Make sure to include all information. Write it in beautiful and structured markdown.'
 
                 persona_sum = st.text_area('Bot Persona Total Sum',
-                                           value=_set_config(config_file, "OPENAI_PERSONA_SUM", default_persona_sum),
+                                           value=_set_config(config_file, "OPENAI_PERSONA_SUM", default_persona_sum_b),
                                            help='This is a pre-defined message for total summarization that is used to'
                                                 'instruct the assistant at the beginning of a conversation. ',
-                                           height=140)
+                                           height=240)
             else:
                 persona_sum = ""
 
