@@ -102,6 +102,5 @@ with result_handler:
                     st.warning(
                         '⚠️Result cut off due to length. Consider increasing the [Max Tokens Summary] parameter.')
         if rec_responses != [] or final_response is not None:
-            print(rec_responses, final_response)
             util.download_results(rec_responses, final_response)
 
