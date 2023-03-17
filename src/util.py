@@ -189,7 +189,7 @@ def exceeded_token_handler(param, chunks) -> bool:
     """Handles the case where the user has exceeded the number of tokens."""
     info = GPT.misc.is_tokens_exceeded(param, chunks, 4096)
     if info['exceeded']:
-        st.error(info['message'])
+        st.error(f"❌ {info['message']}")
         return True
     else:
         return False
