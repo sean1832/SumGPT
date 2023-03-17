@@ -5,8 +5,10 @@ from typing import Any, Dict, List, Tuple, Union
 from pydub import AudioSegment
 import math
 import json
+import streamlit as st
 
 
+@st.cache_data()
 def read_json(file, key: str) -> Any:
     """Reads a json file and returns the value of a key."""
     with open(file, "r") as f:
@@ -14,6 +16,7 @@ def read_json(file, key: str) -> Any:
         return data[key]
 
 
+@st.cache_data()
 def read_json_upload(file, key: str) -> Any:
     """Reads a json file and returns the value of a key."""
     if not isinstance(file, str):
@@ -22,11 +25,13 @@ def read_json_upload(file, key: str) -> Any:
         return data[key]
 
 
+@st.cache_data()
 def read_txt(file, encoding: str = "utf-8") -> str:
     """Reads a text file."""
     return file.read().decode(encoding)
 
 
+@st.cache_data()
 def read_pdf(file) -> List[str]:
     """Reads a pdf file."""
     pdfReader = PyPDF4.PdfFileReader(file, strict=False)
@@ -44,6 +49,7 @@ def read_pdf(file) -> List[str]:
     return texts
 
 
+@st.cache_data()
 def read_docx(file) -> str:
     """Reads a docx file."""
     doc = docx.Document(file)
@@ -55,6 +61,7 @@ def read_docx(file) -> str:
     return text
 
 
+@st.cache_data()
 def _split_audio(audio, chunk_size=2) -> List[AudioSegment]:
     """Split audio into chunks of 10 minutes."""
     # load audio
@@ -73,6 +80,7 @@ def _split_audio(audio, chunk_size=2) -> List[AudioSegment]:
     return chunks
 
 
+@st.cache_data()
 def read(file) -> str | List[str]:
     """Reads a file and returns the content."""
     if file.name.endswith(".txt") or file.name.endswith(".md"):
