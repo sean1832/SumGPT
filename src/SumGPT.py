@@ -69,6 +69,9 @@ with result_handler:
         # max tokens exceeded warning
         exceeded = util.exceeded_token_handler(param=st.session_state['OPENAI_PARAMS'], chunks=chunks)
 
+        rec_responses = []
+        final_response = None
+        finish_reason_rec = None
         if st.button("🚀 Run", disabled=exceeded):
             API_KEY = st.session_state['OPENAI_API_KEY']
             if not API_KEY and GPT.misc.validate_api_key(API_KEY):
@@ -82,16 +85,21 @@ with result_handler:
                     else:
                         final_response = None
 
-                with st.expander("Recursive Summaries", expanded=not st.session_state['FINAL_SUMMARY_MODE']):
-                    for response in rec_responses:
-                        st.info(response)
-                if finish_reason_rec == 'length':
-                    st.warning('⚠️Result cut off due to length. Consider increasing the [Max Tokens Chunks] parameter.')
+        if rec_responses is not []:
+            with st.expander("Recursive Summaries", expanded=not st.session_state['FINAL_SUMMARY_MODE']):
+                for response in rec_responses:
+                    st.info(response)
+            if finish_reason_rec == 'length':
+                st.warning('⚠️Result cut off due to length. Consider increasing the [Max Tokens Chunks] parameter.')
 
-                if st.session_state['FINAL_SUMMARY_MODE']:
-                    st.header("📝Summary")
-                    st.info(final_response)
-                    if finish_reason_final == 'length':
-                        st.warning(
-                            '⚠️Result cut off due to length. Consider increasing the [Max Tokens Summary] parameter.')
-                util.download_results(rec_responses, final_response)
+        if final_response is not None:
+            if st.session_state['FINAL_SUMMARY_MODE']:
+                st.header("📝Summary")
+                st.info(final_response)
+                if finish_reason_final == 'length':
+                    st.warning(
+                        '⚠️Result cut off due to length. Consider increasing the [Max Tokens Summary] parameter.')
+        if rec_responses != [] or final_response is not None:
+            print(rec_responses, final_response)
+            util.download_results(rec_responses, final_response)
+
