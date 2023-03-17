@@ -213,11 +213,11 @@ def download_results(rec_responses, final_response):
     if final_response is not None:
         st.download_button("📥 Download Summary",
                            joint_final_response,
-                           file_name=f"summary_{now.strftime('%Y-%m-%d_%H-%M')}.txt")
+                           file_name=f"summary_{now.strftime('%Y-%m-%d_%H-%M')}.md")
     else:
         st.download_button("📥 Download Summary",
                            joint_rec_response,
-                           file_name=f"summary_{now.strftime('%Y-%m-%d_%H-%M')}.txt")
+                           file_name=f"summary_{now.strftime('%Y-%m-%d_%H-%M')}.md")
 
 
 def exceeded_token_handler(param, chunks) -> bool:
