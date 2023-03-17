@@ -37,13 +37,9 @@ def get_answer_stream(content: str):
         response_panel.info(answer)
 
 
-def get_answer(content: str, recursive: bool, persona: str) -> Tuple[str, str]:
+def get_answer(content: str, max_tokens, persona: str) -> Tuple[str, str]:
     """Returns a response from the OpenAI API."""
     params = st.session_state["OPENAI_PARAMS"]
-    if recursive:
-        max_tokens = params.max_tokens_rec
-    else:
-        max_tokens = params.max_tokens_final
     bot = GPT.bot.OpenAIChatBot(st.session_state["OPENAI_API_KEY"],
                                 persona,
                                 params.model,

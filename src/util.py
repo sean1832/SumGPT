@@ -135,7 +135,7 @@ def search_chunks(query: str, chunks: List[Dict[str, float]], count: int = 1) ->
     return ordered[0:count]
 
 
-def recursive_summarize(chunks: List[Dict[str, float]]) -> Tuple[List[str], str]:
+def recursive_summarize(chunks: List[Dict[str, Union[str, float]]], max_tokens) -> Tuple[List[str], str]:
     """Returns a recursive summary of the given content."""
     recursiveSumTexts = []
     finish_reason = ''
@@ -144,7 +144,8 @@ def recursive_summarize(chunks: List[Dict[str, float]]) -> Tuple[List[str], str]
     progress_bar = st.progress(0)
     for chunk in chunks:
         content = chunk['content']
-        text, finish_reason = GPT.generate.get_answer(content, recursive=True,
+        text, finish_reason = GPT.generate.get_answer(content,
+                                                      max_tokens=max_tokens,
                                                       persona=st.session_state['OPENAI_PERSONA_REC'])
         recursiveSumTexts.append(text)
         progress_bar.progress((count + 1) / chunks_length)
@@ -154,10 +155,17 @@ def recursive_summarize(chunks: List[Dict[str, float]]) -> Tuple[List[str], str]
     return recursiveSumTexts, finish_reason
 
 
-def summarize(recursive_sum: List[str]) -> Tuple[str, str]:
+def summarize(message: List[str] | str) -> Tuple[str, str]:
     """Returns a summary of the given content."""
-    join_sum = ' '.join(recursive_sum)
-    answer, finish_reason = GPT.generate.get_answer(join_sum, recursive=False,
+    if isinstance(message, list):
+        join_msg = ' '.join(message)
+    else:
+        join_msg = message
+
+    params = st.session_state['OPENAI_PARAMS']
+    max_asw_tokens_final = params.max_tokens_final
+
+    answer, finish_reason = GPT.generate.get_answer(join_msg, max_tokens=max_asw_tokens_final,
                                                     persona=st.session_state['OPENAI_PERSONA_SUM'])
     return answer, finish_reason
 

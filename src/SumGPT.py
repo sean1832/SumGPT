@@ -75,7 +75,8 @@ with result_handler:
                 st.error("❌ Please enter a valid [OpenAI API key](https://beta.openai.com/account/api-keys).")
             else:
                 with st.spinner("Summarizing... (this might take a while)"):
-                    rec_responses, finish_reason_rec = util.recursive_summarize(chunks)
+                    rec_max_token = st.session_state['OPENAI_PARAMS'].max_tokens_rec
+                    rec_responses, finish_reason_rec = util.recursive_summarize(chunks, rec_max_token)
                     if st.session_state['FINAL_SUMMARY_MODE']:
                         final_response, finish_reason_final = util.summarize(rec_responses)
                     else:

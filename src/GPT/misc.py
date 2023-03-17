@@ -39,13 +39,18 @@ def predict_token(param, chunks) -> int:
         return 0
 
 
-def predict_token_single(max_tokens, chunk) -> int:
+def predict_token_single(chunk: Dict[str, Union[str, float]] | str, max_tokens: int = None) -> int:
     """predict how many tokens to generate."""
     if st.session_state["OPENAI_API_KEY"] is not None:
         os.environ['OPENAI_API_KEY'] = st.session_state["OPENAI_API_KEY"]
         llm = OpenAI()
-        chunk_token = llm.get_num_tokens(chunk['content'])
-        chunk_token += max_tokens
+        if isinstance(chunk, str):
+            chunk_content = chunk
+        else:
+            chunk_content = chunk['content']
+        chunk_token = llm.get_num_tokens(chunk_content)
+        if max_tokens is not None:
+            chunk_token += max_tokens
 
         return chunk_token
     else:
@@ -58,7 +63,7 @@ def is_tokens_exceeded(param, chunks, max_token: int = 4096) -> Dict[str, Union[
     # check recursive chunks tokens
     rec_chunks_token = []
     for chunk in chunks:
-        chunk_token = predict_token_single(param.max_tokens_rec, chunk)
+        chunk_token = predict_token_single(chunk, param.max_tokens_rec)
         rec_chunks_token.append(chunk_token)
 
 
