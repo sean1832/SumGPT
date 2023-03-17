@@ -63,8 +63,9 @@ def sidebar():
             set_final_summary_mode(enable_final_summary)
 
         with st.expander('🤖 Bot Persona'):
-            default_persona_rec = 'Summarize following content in a detail and comprehensive way in perfect english ' \
-                                  'with no grammar issue while making sure all the key points are included. '
+            default_persona_rec = 'Provide a detailed and comprehensive summary of the following content in flawless ' \
+                                  'English, ensuring all key points are covered. Create a markdown heading (###) that ' \
+                                  'encapsulates the core information of the content. '
             persona_rec = st.text_area('Bot Persona Recursive',
                                        value=_set_config(config_file, "OPENAI_PERSONA_REC", default_persona_rec),
                                        help='System message is a pre-defined message used to instruct the assistant at the '
@@ -73,13 +74,13 @@ def sidebar():
                                             'Make sure to use casual language.',
                                        height=140)
             if enable_final_summary:
-                default_persona_sum_a = 'Provide detail explanation and summary of the following text ' \
+                default_persona_sum_a = 'Provide detail explanation and summary of the following transcript ' \
                                       'into comprehensive and cohesive article in markdown format with ' \
                                       'perfect english while making sure all the key points are included. ' \
                                       'Rephrase and restructure the text so that it can be read fluently, make sense ' \
                                       'and avoid repetition.' \
 
-                default_persona_sum_b = 'identify five key points in the following text and use them as headings. ' \
+                default_persona_sum_b = 'identify five key points in the following transcript and use them as headings. ' \
                                         'Use ### headings in markdown. ' \
                                         'Under headings, provide detail explanation of the concept based on the following text ' \
                                         'in the way that can be read fluently, make sense and avoid repetition. ' \
