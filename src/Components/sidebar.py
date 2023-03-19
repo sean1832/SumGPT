@@ -80,11 +80,12 @@ def sidebar():
                                       'Rephrase and restructure the text so that it can be read fluently, make sense ' \
                                       'and avoid repetition.' \
 
-                default_persona_sum_b = 'identify five key points in the following transcript and use them as headings. ' \
-                                        'Use ### headings in markdown. ' \
-                                        'Under headings, provide detail explanation of the concept based on the following text ' \
-                                        'in the way that can be read fluently, make sense and avoid repetition. ' \
-                                        'Make sure to include all information. Write it in beautiful and structured markdown.'
+                default_persona_sum_b = 'identify headings in the transcript and summarise them into five ' \
+                                        'headings. Use #### headings in markdown. Under headings, summarise at least ' \
+                                        '3 key points and then provide detail explanation of the concept based on the ' \
+                                        'following text in the way that can be read fluently, make sense and avoid ' \
+                                        'repetition. Make sure to include all information. Write it in beautiful and ' \
+                                        'structured markdown. '
 
                 persona_sum = st.text_area('Bot Persona Total Sum',
                                            value=_set_config(config_file, "OPENAI_PERSONA_SUM", default_persona_sum_b),
