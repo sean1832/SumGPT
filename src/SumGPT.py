@@ -13,10 +13,12 @@ file_handler = st.container()
 content_handler = st.container()
 result_handler = st.container()
 
+
 with app_header:
     st.title("📝 SumGPT")
-    st.markdown("##### Summarize your text with OpenAI's GPT-3.5 API")
+    st.markdown("##### Summarize your text with OpenAI's GPT-3.5 / GPT-4 API")
     st.markdown("##### [GitHub repo](https://github.com/sean1832/SumGPT)")
+    st.warning("🚧️ This app is still in beta. Please [report any bugs](https://github.com/sean1832/SumGPT/issues) to the GitHub repo.")
 
 sidebar()
 
@@ -66,8 +68,18 @@ with result_handler:
                 st.write(chunk)
 
         token_usage = GPT.misc.predict_token(st.session_state['OPENAI_PARAMS'], chunks)
-        st.markdown(f"Price Prediction: `${round(token_usage * 0.000002, 5)}` || Token Usage: `{token_usage}`")
-
+        param = st.session_state["OPENAI_PARAMS"]
+        prompt_token = token_usage['prompt']
+        completion_token = token_usage['completion']
+        if param.model == 'gpt-4':
+            price = round(prompt_token * 0.00003 + completion_token * 0.00006, 5)
+            st.markdown('**Note:** To access GPT-4, please [join the waitlist](https://openai.com/waitlist/gpt-4-api)'
+                        " if you haven't already received an invitation from OpenAI.")
+            st.info("ℹ️️ Please keep in mind that GPT-4 is significantly **[more expensive](https://openai.com/pricing#language-models)** than GPT-3.5. ")
+        else:
+            price = round((prompt_token + completion_token) * 0.000002, 5)
+        st.markdown(
+            f"Price Prediction: `${price}` || Total Prompt: `{prompt_token}`, Total Completion: `{completion_token}`")
         # max tokens exceeded warning
         exceeded = util.exceeded_token_handler(param=st.session_state['OPENAI_PARAMS'], chunks=chunks)
 
@@ -75,6 +87,7 @@ with result_handler:
         final_response = None
         finish_reason_rec = None
         if st.button("🚀 Run", disabled=exceeded):
+            st.cache_data.clear()
             API_KEY = st.session_state['OPENAI_API_KEY']
             if not API_KEY and GPT.misc.validate_api_key(API_KEY):
                 st.error("❌ Please enter a valid [OpenAI API key](https://beta.openai.com/account/api-keys).")
@@ -103,4 +116,3 @@ with result_handler:
                         '⚠️Result cut off due to length. Consider increasing the [Max Tokens Summary] parameter.')
         if rec_responses != [] or final_response is not None:
             util.download_results(rec_responses, final_response)
-

@@ -172,6 +172,7 @@ def search_chunks(query: str, chunks: List[Dict[str, float]], count: int = 1) ->
     return ordered[0:count]
 
 
+@st.cache_data(show_spinner=False)
 def recursive_summarize(chunks: List[Dict[str, Union[str, float]]], max_tokens) -> Tuple[List[str], str]:
     """Returns a recursive summary of the given content."""
     recursiveSumTexts = []
@@ -192,6 +193,7 @@ def recursive_summarize(chunks: List[Dict[str, Union[str, float]]], max_tokens) 
     return recursiveSumTexts, finish_reason
 
 
+@st.cache_data(show_spinner=False)
 def summarize(message: List[str] | str) -> Tuple[str, str]:
     """Returns a summary of the given content."""
     if isinstance(message, list):
@@ -224,7 +226,11 @@ def download_results(rec_responses, final_response):
 
 def exceeded_token_handler(param, chunks) -> bool:
     """Handles the case where the user has exceeded the number of tokens."""
-    info = GPT.misc.is_tokens_exceeded(param, chunks, 4096)
+    if param.model == 'gpt-4':
+        max_token = 8100
+    else:
+        max_token = 4096
+    info = GPT.misc.is_tokens_exceeded(param, chunks, max_token)
     if info['exceeded']:
         st.error(f"❌ {info['message']}")
         return True

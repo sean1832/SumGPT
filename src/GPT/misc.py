@@ -21,22 +21,28 @@ def validate_api_key(api_key: str) -> bool:
         return False
 
 
-def predict_token(param, chunks) -> int:
+def predict_token(param, chunks) -> Dict[str, int]:
     """predict how many tokens to generate."""
     if st.session_state["OPENAI_API_KEY"] is not None:
         os.environ['OPENAI_API_KEY'] = st.session_state["OPENAI_API_KEY"]
         llm = OpenAI()
-        total_token = 0
+        prompt_token_total = 0
+        completion_token_total = 0
         for chunk in chunks:
-            chunk_token = llm.get_num_tokens(chunk['content'])
-            chunk_token += param.max_tokens_rec
-            total_token += chunk_token
-        if st.session_state['FINAL_SUMMARY_MODE']:
-            total_token += param.max_tokens_final
+            prompt_token = llm.get_num_tokens(chunk['content'])
+            prompt_token_total += prompt_token
+            completion_token_total += param.max_tokens_rec
 
-        return total_token
+        if st.session_state['FINAL_SUMMARY_MODE']:
+            completion_token_total += param.max_tokens_final
+        total_token = prompt_token_total + completion_token_total
+        token = {'total': total_token,
+                 'prompt': prompt_token_total,
+                 'completion': completion_token_total}
+
+        return token
     else:
-        return 0
+        return {'total': 0, 'prompt': 0, 'completion': 0}
 
 
 def predict_token_single(chunk: Dict[str, Union[str, float]] | str, max_tokens: int = None) -> int:
