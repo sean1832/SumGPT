@@ -1,7 +1,7 @@
 # SumGPT
 [![python](https://img.shields.io/badge/python-3.11-blue)](https://www.python.org/downloads/release/python-3112/)
 
-Bulk summarization of documents using [ChatGPT API](https://platform.openai.com/docs/models/gpt-3-5)
+Detail summarization of documents using [ChatGPT API](https://platform.openai.com/docs/models/gpt-3-5)
 
 Web App: [https://sumgpt.streamlit.app](https://sumgpt.streamlit.app/)
 
@@ -13,8 +13,8 @@ Web App: [https://sumgpt.streamlit.app](https://sumgpt.streamlit.app/)
 ---
 
 ### Features
-- Summarize multiple documents (.pdf, .docx, .txt, .md) at once.
-- Able to summarize large documents.
+- Summarize document (.pdf, .docx, .txt, .md).
+- Summarize Youtube video with subtitles.
 
 ### What you need
 - OpenAI **[API keys](https://platform.openai.com/account/api-keys)**
