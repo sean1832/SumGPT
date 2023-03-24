@@ -1,9 +1,9 @@
 # SumGPT
 [![python](https://img.shields.io/badge/python-3.11-blue)](https://www.python.org/downloads/release/python-3112/)
 
-Detail summarization of documents using [ChatGPT API](https://platform.openai.com/docs/models/gpt-3-5)
+Detail summarization of documents using [GPT-3.5](https://platform.openai.com/docs/models/gpt-3-5) and [GPT-4](https://platform.openai.com/docs/models/gpt-4) API from [OpenAI](https://openai.com/).
 
-Web App: [https://sumgpt.streamlit.app](https://sumgpt.streamlit.app/)
+🌐 Web App: [https://sumgpt.streamlit.app](https://sumgpt.streamlit.app/)
 
 ---
 *⭐️ Like this repo? please consider a star!*
@@ -12,14 +12,19 @@ Web App: [https://sumgpt.streamlit.app](https://sumgpt.streamlit.app/)
 
 ---
 
-### Features
-- Summarize document (.pdf, .docx, .txt, .md).
-- Summarize Youtube video with subtitles.
+### 🌟 Features
+- 📄 Summarize document (.pdf, .docx, .txt, .md).
+- 🎥 Summarize YouTube video with subtitles.
+- 🤖 Customizable parameters and bot persona for refined response generation.
+- 💼 Export & import configs for easy sharing and reuse.
+- 🧠 Supports GPT-3.5 and GPT-4.
 
-### What you need
-- OpenAI **[API keys](https://platform.openai.com/account/api-keys)**
+### 💡 What you need
+- 🔑 OpenAI **[API keys](https://platform.openai.com/account/api-keys)**
 
-### Running Locally
+> ***Note: To access GPT-4, please [join the waitlist](https://openai.com/waitlist/gpt-4-api) if you haven't already received an invitation from OpenAI.***
+
+### 💻 Running Locally
 - Make sure you have **[python 3.11](https://www.python.org/downloads)** | [python installation tutorial (YouTube)](https://youtu.be/HBxCHonP6Ro?t=105)
 1. Clone the repository
 ```bash
