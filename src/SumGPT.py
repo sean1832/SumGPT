@@ -1,9 +1,11 @@
+import asyncio
 import Components
 import streamlit as st
 from Components.sidebar import sidebar
 import Modules.file_io as file_io
 import GPT
 import util
+import time
 
 Components.StreamlitSetup.setup()
 
@@ -82,37 +84,48 @@ with result_handler:
             f"Price Prediction: `${price}` || Total Prompt: `{prompt_token}`, Total Completion: `{completion_token}`")
         # max tokens exceeded warning
         exceeded = util.exceeded_token_handler(param=st.session_state['OPENAI_PARAMS'], chunks=chunks)
-
         rec_responses = []
         final_response = None
         finish_reason_rec = None
+        finish_reason_final = None
+
+        # finish_reason_rec = None
         if st.button("🚀 Run", disabled=exceeded):
+            start_time = time.time()
             st.cache_data.clear()
             API_KEY = st.session_state['OPENAI_API_KEY']
             if not API_KEY and GPT.misc.validate_api_key(API_KEY):
                 st.error("❌ Please enter a valid [OpenAI API key](https://beta.openai.com/account/api-keys).")
             else:
                 with st.spinner("Summarizing... (this might take a while)"):
-                    rec_max_token = st.session_state['OPENAI_PARAMS'].max_tokens_rec
-                    rec_responses, finish_reason_rec = util.recursive_summarize(chunks, rec_max_token)
-                    if st.session_state['FINAL_SUMMARY_MODE']:
-                        final_response, finish_reason_final = util.summarize(rec_responses)
+                    if st.session_state['LEGACY']:
+                        rec_max_token = st.session_state['OPENAI_PARAMS'].max_tokens_rec
+                        rec_responses, finish_reason_rec = util.recursive_summarize(chunks, rec_max_token)
+                        if st.session_state['FINAL_SUMMARY_MODE']:
+                            final_response, finish_reason_final = util.summarize(rec_responses)
+                        else:
+                            final_response = None
                     else:
-                        final_response = None
+                        completions, final_response = asyncio.run(util.summarize_experimental_concurrently(content, st.session_state['CHUNK_SIZE']))
+                        rec_responses = [d["content"] for d in completions]
+                        rec_ids = [d["chunk_id"] for d in completions]
+                        # final_response = completion['output_text']
+
+            end_time = time.time()
+            st.markdown(f"⏱️ Time taken: `{round(end_time - start_time, 2)}s`")
 
         if rec_responses is not []:
             with st.expander("Recursive Summaries", expanded=not st.session_state['FINAL_SUMMARY_MODE']):
-                for response in rec_responses:
-                    st.info(response)
+                for i, response in enumerate(rec_responses):
+                    st.info(f'{response}')
             if finish_reason_rec == 'length':
                 st.warning('⚠️Result cut off due to length. Consider increasing the [Max Tokens Chunks] parameter.')
 
         if final_response is not None:
-            if st.session_state['FINAL_SUMMARY_MODE']:
-                st.header("📝Summary")
-                st.info(final_response)
-                if finish_reason_final == 'length':
-                    st.warning(
-                        '⚠️Result cut off due to length. Consider increasing the [Max Tokens Summary] parameter.')
+            st.header("📝Summary")
+            st.info(final_response)
+            if finish_reason_final == 'length':
+                st.warning(
+                    '⚠️Result cut off due to length. Consider increasing the [Max Tokens Summary] parameter.')
         if rec_responses != [] or final_response is not None:
             util.download_results(rec_responses, final_response)

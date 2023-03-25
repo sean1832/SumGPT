@@ -91,6 +91,7 @@ def is_tokens_exceeded(param, chunks, max_token: int = 4096) -> Dict[str, Union[
                 'reason': 'final',
                 'message': f"**[ Final summary ]** tokens exceeded. Max tokens allowed: {max_token}. Tokens used: {final_chunks_token}\n"
                            f"(Prompt: {final_prompt_token}, Completion: {final_completion_token})"}
+
     else:
         return {'exceeded': False,
                 'reason': '',

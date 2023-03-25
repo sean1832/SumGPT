@@ -1,5 +1,5 @@
 docx==0.2.4
-langchain==0.0.112
+langchain==0.0.123
 langdetect==1.0.9
 numpy==1.24.2
 openai==0.27.2

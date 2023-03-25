@@ -37,6 +37,17 @@ def _set_config(config_file, key: str, default_value):
     else:
         return default_value
 
+def _set_language(language: str):
+    st.session_state['OUTPUT_LANGUAGE'] = language
+
+def _set_legacy(enable: bool):
+    st.session_state['LEGACY'] = enable
+def _legacy(enable: bool, legacy, experimental):
+    if not enable:
+        return experimental
+    else:
+        return legacy
+
 
 def sidebar():
     with st.sidebar:
@@ -55,6 +66,7 @@ def sidebar():
                                   help="You can get your API key from https://beta.openai.com/account/api-keys",
                                   value=_set_config(config_file, "OPENAI_API_KEY", ""))
 
+        enable_legacy = st_toggle_switch(label="Legacy", default_value=_set_config(config_file, "LEGACY", False))
         enable_final_summary = st_toggle_switch(label="Enable Final Summary",
                                                 default_value=_set_config(config_file, "FINAL_SUMMARY_MODE", False))
         if enable_final_summary:
@@ -63,40 +75,48 @@ def sidebar():
             set_final_summary_mode(enable_final_summary)
 
         with st.expander('🤖 Bot Persona'):
-            default_persona_rec = 'Provide a detailed and comprehensive summary of the following content in flawless ' \
-                                  'English, ensuring all key points are covered. Create a markdown heading (###) that ' \
-                                  'encapsulates the core information of the content. '
+            language = st.selectbox('Language', ['English', 'Chinese', 'Japanese', 'Korean', 'Spanish', 'French', 'German'])
+            default_persona_rec_legacy = 'Provide a detailed and comprehensive summary of the following content in flawless ' \
+                                  f'{language}, ensuring all key points are covered. Create a markdown heading (###) that ' \
+                                  f'encapsulates the core information of the content. Make sure it is answered in {language}.'
+            default_persona_rec = f"""Write a detailed and comprehensive explanation of the following in perfect {language} with no grammar issues, 
+ensuring all key points are covered. Create a markdown heading (###) that encapsulates the core information:""" +  \
+"""
+                                  
+{text}
+                                  
+Structured markdown summary with heading (###): """
             persona_rec = st.text_area('Bot Persona Recursive',
-                                       value=_set_config(config_file, "OPENAI_PERSONA_REC", default_persona_rec),
+                                       value=_set_config(config_file, "OPENAI_PERSONA_REC", _legacy(enable_legacy, default_persona_rec_legacy, default_persona_rec)),
                                        help='System message is a pre-defined message used to instruct the assistant at the '
                                             'beginning of a conversation. iterating and '
                                             'experimenting with potential improvements can help to generate better outputs.'
                                             'Make sure to use casual language.',
-                                       height=140)
+                                       height=250)
             if enable_final_summary:
-                default_persona_sum_a = 'Provide detail explanation and summary of the following transcript ' \
-                                      'into comprehensive and cohesive article in markdown format with ' \
-                                      'perfect english while making sure all the key points are included. ' \
-                                      'Rephrase and restructure the text so that it can be read fluently, make sense ' \
-                                      'and avoid repetition.' \
-
-                default_persona_sum_b = 'identify headings in the transcript and summarise them into five ' \
+                default_persona_sum_legacy = 'identify headings in the transcript and summarise them into five ' \
                                         'headings. Use #### headings in markdown. Under headings, summarise at least ' \
                                         '3 key points and then provide detail explanation of the concept based on the ' \
                                         'following text in the way that can be read fluently, make sense and avoid ' \
                                         'repetition. Make sure to include all information. Write it in beautiful and ' \
-                                        'structured markdown. '
+                                        f'structured markdown in perfect {language}. '
+                default_persona_sum = """Write a detailed summary of the following: 
+                
+{text}
+                                      
+Identify and summarise them into five headings. Use #### headings in markdown. Under headings, summarize a list of key points that best encapsulate the core information.""" + \
+f"""Structured markdown summary with headings in perfect {language} (####): """
 
                 persona_sum = st.text_area('Bot Persona Total Sum',
-                                           value=_set_config(config_file, "OPENAI_PERSONA_SUM", default_persona_sum_b),
+                                           value=_set_config(config_file, "OPENAI_PERSONA_SUM", _legacy(enable_legacy, default_persona_sum_legacy, default_persona_sum)),
                                            help='This is a pre-defined message for total summarization that is used to'
                                                 'instruct the assistant at the beginning of a conversation. ',
-                                           height=240)
+                                           height=300)
             else:
                 persona_sum = ""
 
         with st.expander('🔥 Advanced Options'):
-            model_options = ['gpt-3.5-turbo', 'gpt-3.5-turbo-0301', 'gpt-4']
+            model_options = ['gpt-3.5-turbo', 'gpt-4']
             model_index = model_options.index(_set_config(config_file, "MODEL", 'gpt-3.5-turbo'))
             model = st.selectbox("Model", options=model_options, index=model_index)
 
@@ -162,7 +182,8 @@ def sidebar():
 
         if persona_rec:
             set_openai_persona(persona_rec, persona_sum)
-
+        _set_language(language)
         set_chunk_size(chunk_size)
         set_param(param)
         set_delay(delay)
+        _set_legacy(enable_legacy)

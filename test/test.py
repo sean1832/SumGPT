@@ -1,19 +1,33 @@
-from pytube import YouTube
-import xml.etree.ElementTree as ET
+import asyncio
+
+async def coroutine1():
+    await asyncio.sleep(2)
+    return {"id": 1, "content": "result 1"}
+
+async def coroutine2():
+    await asyncio.sleep(1)
+    return {"id": 2, "content": "result 2"}
+
+async def main():
+    tasks = [coroutine1(), coroutine2()]
+    completed_count = 0
+    results = []
+
+    for coro in asyncio.as_completed(tasks):
+        result = await coro
+        results.append(result)
+        completed_count += 1
+        print(f"Coroutine {result['id']} completed ({completed_count}/{len(tasks)}).")
+
+    print("All coroutines completed.")
+    print("Results:", sorted(results, key=lambda x: x['id']))
+
+asyncio.run(main())
 
 
-def extract_xml_caption(xml: str) -> str:
-    """Extracts the text content from the <s> elements of an XML string."""
-    root = ET.fromstring(xml)
-    text_content = ''
-    for child in root.iter('s'):
-        text_content += child.text
-    return text_content.strip()
 
 
-def get_transcript(url: str, lang_code: str = 'a.en') -> str:
-    """Extracts the transcript from a YouTube video."""
-    yt = YouTube(url)
-    caption = yt.captions[lang_code]
-    xml_caption = caption.xml_captions
-    return extract_xml_caption(xml_caption)
+
+
+
+

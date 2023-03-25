@@ -1,3 +1,6 @@
+import os
+import asyncio
+
 import numpy as np
 from typing import Any, Dict, List, Tuple, Union
 from GPT.embeddings import openAIEmbeddings
@@ -11,6 +14,11 @@ from pytube import YouTube
 import xml.etree.ElementTree as ET
 from datetime import datetime
 
+from langchain.chat_models import ChatOpenAI
+from langchain.docstore.document import Document
+from langchain.prompts import PromptTemplate
+from langchain.chains.summarize import load_summarize_chain
+from langchain.chains import LLMChain
 
 def _is_auto_lang(lang_code: str) -> bool:
     """Checks if the language code is an auto language."""
@@ -153,7 +161,7 @@ def convert_to_chunks(content: str, chunk_size: int = 1000, enable_embedding: bo
             embedding = openAIEmbeddings(st.session_state["OPENAI_API_KEY"])
             chunks.append({'content': chunk, 'vector': embedding.embedding(chunk)})
         else:
-            chunks.append({'content': chunk, 'language_based': language_base(chunk)})
+            chunks.append({'content': chunk, 'language_based': language_base(chunk), 'chunk_id': i})
     return chunks
 
 
@@ -171,6 +179,65 @@ def search_chunks(query: str, chunks: List[Dict[str, float]], count: int = 1) ->
     ordered = sorted(points, key=lambda x: x['point'], reverse=True)
     return ordered[0:count]
 
+@st.cache_data(show_spinner=False)
+def convert_to_docs(chunks: List[Dict[str, Union[str, float]]]) -> List[Document] | Document:
+    """Converts a list of chunks into a list of documents."""
+    docs = []
+    for chunk in chunks:
+        content = chunk['content']
+        metadata = {'chunk_id': chunk['chunk_id']}
+        doc = Document(page_content=content, metadata=metadata)
+        docs.append(doc)
+    return docs
+
+async def async_generate(chain, chunk)-> Dict[str, Union[str, int]]:
+    """Generates a summary asynchronously."""
+    resp = await chain.arun(text=chunk['content'])
+    return {'content': resp, 'chunk_id': chunk['chunk_id']}
+
+async def summarize_experimental_concurrently(content: str, chunk_size: int = 1000) -> Tuple[List[Dict[str, Union[str, int]]], str]:
+    """Summarizes a string asynchronously."""
+    os.environ['OPENAI_API_KEY'] = st.session_state["OPENAI_API_KEY"]
+    params = st.session_state['OPENAI_PARAMS']
+    llm_rec = ChatOpenAI(model_name=params.model,
+                    max_tokens=params.max_tokens_rec,
+                    temperature=params.temperature,
+                    top_p=params.top_p,
+                    frequency_penalty=params.frequency_penalty,
+                    presence_penalty=params.presence_penalty)
+    llm_final = ChatOpenAI(model_name=params.model,
+                         max_tokens=params.max_tokens_final,
+                         temperature=params.temperature,
+                         top_p=params.top_p,
+                         frequency_penalty=params.frequency_penalty,
+                         presence_penalty=params.presence_penalty)
+    chunks = convert_to_chunks(content, chunk_size)
+
+    REC_PROMPT = PromptTemplate(template=st.session_state['OPENAI_PERSONA_REC'], input_variables=['text'])
+    FINAL_PROMPT = PromptTemplate(template=st.session_state['OPENAI_PERSONA_SUM'], input_variables=['text'])
+    chain = LLMChain(llm=llm_rec, prompt=REC_PROMPT)
+
+    tasks = []
+    for chunk in chunks:
+        task = async_generate(chain, chunk)
+        tasks.append(task)
+
+    outputs_rec = []
+    progress_bar = st.progress(0, f"Generating summary 0/{len(chunks)}")
+    count = 1
+    for coro in asyncio.as_completed(tasks):
+        output_rec = await coro
+        outputs_rec.append(output_rec)
+        progress_bar.progress(count / len(chunks), f"Generating summary {count}/{len(chunks)}")
+        count += 1
+    rec_result = sorted(outputs_rec, key=lambda x: x['chunk_id'])
+    if st.session_state['FINAL_SUMMARY_MODE']:
+        chain = load_summarize_chain(llm_final, chain_type='stuff', prompt=FINAL_PROMPT)
+        docs = convert_to_docs(rec_result)
+        final_result = chain.run(docs)
+    else:
+        final_result = ''
+    return rec_result, final_result
 
 @st.cache_data(show_spinner=False)
 def recursive_summarize(chunks: List[Dict[str, Union[str, float]]], max_tokens) -> Tuple[List[str], str]:
