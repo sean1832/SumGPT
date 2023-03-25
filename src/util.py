@@ -214,7 +214,6 @@ async def summarize_experimental_concurrently(content: str, chunk_size: int = 10
     chunks = convert_to_chunks(content, chunk_size)
 
     REC_PROMPT = PromptTemplate(template=st.session_state['OPENAI_PERSONA_REC'], input_variables=['text'])
-    FINAL_PROMPT = PromptTemplate(template=st.session_state['OPENAI_PERSONA_SUM'], input_variables=['text'])
     chain = LLMChain(llm=llm_rec, prompt=REC_PROMPT)
 
     tasks = []
@@ -232,11 +231,12 @@ async def summarize_experimental_concurrently(content: str, chunk_size: int = 10
         count += 1
     rec_result = sorted(outputs_rec, key=lambda x: x['chunk_id'])
     if st.session_state['FINAL_SUMMARY_MODE']:
+        FINAL_PROMPT = PromptTemplate(template=st.session_state['OPENAI_PERSONA_SUM'], input_variables=['text'])
         chain = load_summarize_chain(llm_final, chain_type='stuff', prompt=FINAL_PROMPT)
         docs = convert_to_docs(rec_result)
         final_result = chain.run(docs)
     else:
-        final_result = ''
+        final_result = None
     return rec_result, final_result
 
 @st.cache_data(show_spinner=False)
