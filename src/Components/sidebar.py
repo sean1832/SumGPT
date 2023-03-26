@@ -57,8 +57,7 @@ def sidebar():
                     "3. 🏃 Run\n"
                     "---")
 
-        with st.expander('⚙️ Configs Import'):
-            config_file = st.file_uploader("📁 Import Configs", type=['json'])
+        config_file = st.file_uploader("📁 Import Configs", type=['json'])
 
         api_input = st.text_input(label="🔑 OpenAI API Key",
                                   placeholder="Enter your OpenAI API key (sk-...)",
@@ -75,7 +74,9 @@ def sidebar():
             set_final_summary_mode(enable_final_summary)
 
         with st.expander('🤖 Bot Persona'):
-            language = st.selectbox('Language', ['English', 'Chinese', 'Japanese', 'Korean', 'Spanish', 'French', 'German'])
+            language_options = ['English', 'Chinese', 'Japanese', 'Korean', 'Spanish', 'French', 'German']
+            language_index = language_options.index(_set_config(config_file, "LANGUAGE", 'English'))
+            language = st.selectbox('Language', options=language_options, index=language_index)
             default_persona_rec_legacy = 'Provide a detailed and comprehensive summary of the following content in flawless ' \
                                   f'{language}, ensuring all key points are covered. Create a markdown heading (###) that ' \
                                   f'encapsulates the core information of the content. Make sure it is answered in {language}.'
@@ -172,7 +173,9 @@ f"""Structured markdown summary with headings in perfect {language} (####): """
                                "PRESENCE_PENALTY": presence_penalty,
                                "MODEL": model,
                                "ENABLE_DELAY": delay > 0,
-                               "DELAY_TIME": delay
+                               "DELAY_TIME": delay,
+                               "LANGUAGE": language,
+                               "LEGACY": enable_legacy
                            }, indent=4),
                            file_name="configs.json")
         Components.Info.info()
