@@ -66,6 +66,7 @@ def _get_caption(url: str, lang_code: str | List[str] = 'a.en') -> str:
             try:
                 if source_captions == {}:
                     info_display.error(f'❌ No captions found in this video. Please try another one.')
+                    time.sleep(1)
             except KeyError:
                 info_display.error(f'❌ Caption language currently not supported.\n\n'
                          f'{source_captions}\n\n'
