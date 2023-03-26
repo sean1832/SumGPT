@@ -85,8 +85,9 @@ ensuring all key points are covered. Create a markdown heading (###) that encaps
 """
                                   
 {text}
-                                  
-Structured markdown explanation with heading (###): """
+
+""" + \
+f"""Structured markdown explanation with heading (###) in perfect {language}: """
             persona_rec = st.text_area('Bot Persona Recursive',
                                        value=_set_config(config_file, "OPENAI_PERSONA_REC", _legacy(enable_legacy, default_persona_rec_legacy, default_persona_rec)),
                                        help='System message is a pre-defined message used to instruct the assistant at the '
@@ -101,8 +102,9 @@ Structured markdown explanation with heading (###): """
                                         'following text in the way that can be read fluently, make sense and avoid ' \
                                         'repetition. Make sure to include all information. Write it in beautiful and ' \
                                         f'structured markdown in perfect {language}. '
-                default_persona_sum = """Write a detailed summary of the following: 
-                
+                default_persona_sum = f"""Write a detailed summary of the following in {language}: 
+""" + \
+"""                
 {text}
                                       
 Identify and summarise them into five headings. Use #### headings in markdown. Under headings, summarize a list of key points that best encapsulate the core information.""" + \
