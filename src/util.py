@@ -27,7 +27,7 @@ def _is_auto_lang(lang_code: str) -> bool:
     """Checks if the language code is an auto language."""
     return lang_code.startswith('a.')
 
-
+@st.cache_data(show_spinner=False)
 def _extract_xml_caption(xml: str, is_auto_lang: bool) -> str:
     """Extracts the text content from the <s> elements of an XML string."""
     root = ET.fromstring(xml)
@@ -90,7 +90,7 @@ def _similarity(v1, v2) -> np.ndarray:
     """Returns the cosine similarity between two vectors."""
     return np.dot(v1, v2)
 
-
+@st.cache_data(show_spinner=False)
 def _chunk_spliter(content: str, chunk_size: int = 1000, lang_base: str = 'latin') -> List[str]:
     """Splits a string into chunks of a given size."""
 

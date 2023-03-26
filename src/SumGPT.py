@@ -14,7 +14,7 @@ app_header = st.container()
 file_handler = st.container()
 content_handler = st.container()
 result_handler = st.container()
-
+output_handler = st.container()
 
 with app_header:
     st.title("📝 SumGPT")
@@ -85,10 +85,23 @@ with result_handler:
             f"Price Prediction: `${price}` || Total Prompt: `{prompt_token}`, Total Completion: `{completion_token}`")
         # max tokens exceeded warning
         exceeded = util.exceeded_token_handler(param=st.session_state['OPENAI_PARAMS'], chunks=chunks)
-        rec_responses = []
-        final_response = None
-        finish_reason_rec = None
-        finish_reason_final = None
+
+        print(f"OPENAI_API_KEY:{st.session_state['OPENAI_API_KEY']}")
+        print(f"previous result: {st.session_state['PREVIOUS_RESULTS']}")
+
+        if st.session_state['PREVIOUS_RESULTS'] is not None:
+            rec_responses = st.session_state['PREVIOUS_RESULTS']['rec_responses']
+            rec_id = st.session_state['PREVIOUS_RESULTS']['rec_ids']
+            final_response = st.session_state['PREVIOUS_RESULTS']['final_response']
+            finish_reason_rec = st.session_state['PREVIOUS_RESULTS']['finish_reason_rec']
+            finish_reason_final = st.session_state['PREVIOUS_RESULTS']['finish_reason_final']
+
+        else:
+            rec_responses = None
+            rec_id = None
+            final_response = None
+            finish_reason_rec = None
+            finish_reason_final = None
 
         # finish_reason_rec = None
         if st.button("🚀 Run", disabled=exceeded):
@@ -110,12 +123,19 @@ with result_handler:
                         completions, final_response = asyncio.run(util.summarize_experimental_concurrently(content, st.session_state['CHUNK_SIZE']))
                         rec_responses = [d["content"] for d in completions]
                         rec_ids = [d["chunk_id"] for d in completions]
-                        # final_response = completion['output_text']
+                        # save previous completions
+                        resp = {'rec_responses': rec_responses,
+                                'rec_ids': rec_ids,
+                                'final_response': final_response,
+                                'finish_reason_rec': finish_reason_rec,
+                                'finish_reason_final': finish_reason_final}
+                        if resp != st.session_state['PREVIOUS_RESULTS']:
+                            st.session_state['PREVIOUS_RESULTS'] = resp
 
             end_time = time.time()
             st.markdown(f"⏱️ Time taken: `{round(end_time - start_time, 2)}s`")
 
-        if rec_responses is not []:
+        if rec_responses is not None:
             with st.expander("Recursive Summaries", expanded=not st.session_state['FINAL_SUMMARY_MODE']):
                 for i, response in enumerate(rec_responses):
                     st.info(f'{response}')
@@ -128,5 +148,5 @@ with result_handler:
             if finish_reason_final == 'length':
                 st.warning(
                     '⚠️Result cut off due to length. Consider increasing the [Max Tokens Summary] parameter.')
-        if rec_responses != [] or final_response is not None:
+        if final_response is not None:
             util.download_results(rec_responses, final_response)
