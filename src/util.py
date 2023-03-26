@@ -42,9 +42,10 @@ def _extract_xml_caption(xml: str, is_auto_lang: bool) -> str:
         text_content = text
     return text_content.strip()
 
-
+@st.cache_data(show_spinner=False)
 def _get_caption(url: str, lang_code: str | List[str] = 'a.en') -> str:
     """Extracts the transcript from a YouTube video."""
+    attempt = 3
     yt = YouTube(url)
     caption = None
     selected_lang = None
@@ -57,15 +58,18 @@ def _get_caption(url: str, lang_code: str | List[str] = 'a.en') -> str:
         except KeyError:
             continue  # try next language
 
+    info_display = st.empty()
+
     if caption is None:
         source_captions = yt.captions
-        try:
-            if source_captions == {}:
-                st.error(f'❌ No captions found in this video. Please try another one.')
-        except KeyError:
-            st.error(f'❌ Caption language currently not supported.\n\n'
-                     f'{source_captions}\n\n'
-                     f'Please [report this issue on Here](https://github.com/sean1832/SumGPT/issues)')
+        for i in range(attempt):
+            try:
+                if source_captions == {}:
+                    info_display.error(f'❌ No captions found in this video. Please try another one.')
+            except KeyError:
+                info_display.error(f'❌ Caption language currently not supported.\n\n'
+                         f'{source_captions}\n\n'
+                         f'Please [report this issue on Here](https://github.com/sean1832/SumGPT/issues)')
         st.stop()
 
     else:

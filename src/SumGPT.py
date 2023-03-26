@@ -94,7 +94,6 @@ with result_handler:
         if st.button("🚀 Run", disabled=exceeded):
             start_time = time.time()
             st.cache_data.clear()
-            util.clear_cache('summary')
             API_KEY = st.session_state['OPENAI_API_KEY']
             if not API_KEY and not GPT.misc.validate_api_key(API_KEY):
                 st.error("❌ Please enter a valid [OpenAI API key](https://beta.openai.com/account/api-keys).")
