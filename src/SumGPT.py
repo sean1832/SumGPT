@@ -25,7 +25,8 @@ with app_header:
 sidebar()
 
 with file_handler:
-    st.button("🔃 Refresh")
+    if st.button("🔃 Refresh"):
+        st.cache_data.clear()
     youtube_link_empty = st.empty()
     upload_file_emtpy = st.empty()
 
