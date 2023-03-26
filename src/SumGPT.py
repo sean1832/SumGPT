@@ -14,7 +14,6 @@ app_header = st.container()
 file_handler = st.container()
 content_handler = st.container()
 result_handler = st.container()
-output_handler = st.container()
 
 with app_header:
     st.title("📝 SumGPT")
@@ -86,16 +85,13 @@ with result_handler:
         # max tokens exceeded warning
         exceeded = util.exceeded_token_handler(param=st.session_state['OPENAI_PARAMS'], chunks=chunks)
 
-        print(f"OPENAI_API_KEY:{st.session_state['OPENAI_API_KEY']}")
-        print(f"previous result: {st.session_state['PREVIOUS_RESULTS']}")
-
+        # load cached results
         if st.session_state['PREVIOUS_RESULTS'] is not None:
             rec_responses = st.session_state['PREVIOUS_RESULTS']['rec_responses']
             rec_id = st.session_state['PREVIOUS_RESULTS']['rec_ids']
             final_response = st.session_state['PREVIOUS_RESULTS']['final_response']
             finish_reason_rec = st.session_state['PREVIOUS_RESULTS']['finish_reason_rec']
             finish_reason_final = st.session_state['PREVIOUS_RESULTS']['finish_reason_final']
-
         else:
             rec_responses = None
             rec_id = None
