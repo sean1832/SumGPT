@@ -86,7 +86,7 @@ ensuring all key points are covered. Create a markdown heading (###) that encaps
                                   
 {text}
                                   
-Structured markdown summary with heading (###): """
+Structured markdown explanation with heading (###): """
             persona_rec = st.text_area('Bot Persona Recursive',
                                        value=_set_config(config_file, "OPENAI_PERSONA_REC", _legacy(enable_legacy, default_persona_rec_legacy, default_persona_rec)),
                                        help='System message is a pre-defined message used to instruct the assistant at the '
