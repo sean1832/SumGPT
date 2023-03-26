@@ -3,6 +3,9 @@ import asyncio
 
 import numpy as np
 from typing import Any, Dict, List, Tuple, Union
+
+import pytube.exceptions
+
 from GPT.embeddings import openAIEmbeddings
 import streamlit as st
 import re
@@ -55,12 +58,14 @@ def _get_caption(url: str, lang_code: str | List[str] = 'a.en') -> str:
             continue  # try next language
 
     if caption is None:
-        yt_captions = yt.captions
-        if yt_captions is not None:
+        source_captions = yt.captions
+        try:
+            if source_captions == {}:
+                st.error(f'❌ No captions found in this video. Please try another one.')
+        except KeyError:
             st.error(f'❌ Caption language currently not supported.\n\n'
-                     f'{yt_captions}')
-        else:
-            st.error(f'❌ No captions found in this video. Please try another one.')
+                     f'{source_captions}\n\n'
+                     f'Please [report this issue on Here](https://github.com/sean1832/SumGPT/issues)')
         st.stop()
 
     else:
@@ -143,13 +148,19 @@ def language_base(string: str) -> str:
 @st.cache_data(show_spinner=False)
 def extract_youtube_transcript(url: str, lang_code: str | List[str] = 'a.en') -> Tuple[str, str]:
     """Extracts the transcript from a YouTube video."""
+    attempt = 5
+    for i in range(attempt):
+        try:
+            youtube = YouTube(url)
+            title = youtube.title
+            transcript = _get_caption(url, lang_code)
+            return transcript, title
+        except pytube.exceptions.PytubeError as e:
+            time.sleep(1)
+            print(f"Attempt {i + 1} failed with error: {str(e)}")
 
-    youtube = YouTube(url)
-    time.sleep(0.3)
-    title = youtube.title
-    transcript = _get_caption(url, lang_code)
-    return transcript, title
-
+    st.error(f'❌ Failed to fetch data from YouTube after {attempt} attempts. Please "🔃 Refresh" button to try again.')
+    st.stop()
 
 @st.cache_data(show_spinner=False)
 def convert_to_chunks(content: str, chunk_size: int = 1000, enable_embedding: bool = False) -> List[Dict[str, float]]:
