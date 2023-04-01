@@ -3,6 +3,7 @@ import GPT
 import Modules.file_io as file_io
 from streamlit_toggle import st_toggle_switch
 import Components
+from typing import Any, Dict, List, Tuple, Union
 import json
 
 
@@ -47,7 +48,13 @@ def _legacy(enable: bool, legacy, experimental):
         return experimental
     else:
         return legacy
-
+def _extract_prompt(json_data: List[Dict[str,Union[bool, str]]], target_type: str, target_legacy: bool, language: str = "English") -> str | None:
+    for item in json_data:
+        if item["type"] == target_type and item["legacy"] == target_legacy:
+            prompt = item["prompt"]
+            new_prompt = prompt.replace("[LANGUAGE]", language)
+            return new_prompt
+    return None
 
 def sidebar():
     with st.sidebar:
@@ -77,41 +84,25 @@ def sidebar():
             language_options = ['English', 'Chinese', 'Japanese', 'Korean', 'Spanish', 'French', 'German']
             language_index = language_options.index(_set_config(config_file, "LANGUAGE", 'English'))
             language = st.selectbox('Language', options=language_options, index=language_index)
-            default_persona_rec_legacy = 'Provide a detailed and comprehensive summary of the following content in flawless ' \
-                                  f'{language}, ensuring all key points are covered. Create a markdown heading (###) that ' \
-                                  f'encapsulates the core information of the content. Make sure it is answered in {language}.'
-            default_persona_rec = f"""Write a detailed and comprehensive explanation of the following in perfect {language} with no grammar issues, 
-ensuring all key points are covered. Create a markdown heading (###) that encapsulates the core information:""" +  \
-"""
-                                  
-{text}
+            _set_language(language)
 
-""" + \
-f"""Structured markdown explanation with heading (###) in perfect {language}: """
+            prompts = file_io.read_json("resources/prompt.json")
+
+            persona_rec_legacy = _extract_prompt(prompts, "recursive", True, language)
+            persona_rec = _extract_prompt(prompts, "recursive", False, language)
             persona_rec = st.text_area('Bot Persona Recursive',
-                                       value=_set_config(config_file, "OPENAI_PERSONA_REC", _legacy(enable_legacy, default_persona_rec_legacy, default_persona_rec)),
+                                       value=_set_config(config_file, "OPENAI_PERSONA_REC", _legacy(enable_legacy, persona_rec_legacy, persona_rec)),
                                        help='System message is a pre-defined message used to instruct the assistant at the '
                                             'beginning of a conversation. iterating and '
                                             'experimenting with potential improvements can help to generate better outputs.'
                                             'Make sure to use casual language.',
                                        height=250)
             if enable_final_summary:
-                default_persona_sum_legacy = 'identify headings in the transcript and summarise them into five ' \
-                                        'headings. Use #### headings in markdown. Under headings, summarise at least ' \
-                                        '3 key points and then provide detail explanation of the concept based on the ' \
-                                        'following text in the way that can be read fluently, make sense and avoid ' \
-                                        'repetition. Make sure to include all information. Write it in beautiful and ' \
-                                        f'structured markdown in perfect {language}. '
-                default_persona_sum = f"""Write a detailed summary of the following in {language}: 
-""" + \
-"""                
-{text}
-                                      
-Identify and summarise them into five headings. Use #### headings in markdown. Under headings, summarize a list of key points that best encapsulate the core information.""" + \
-f"""Structured markdown summary with headings in perfect {language} (####): """
+                persona_sum_legacy = _extract_prompt(prompts, "final", True, language)
+                persona_sum = _extract_prompt(prompts, "final", False, language)
 
                 persona_sum = st.text_area('Bot Persona Total Sum',
-                                           value=_set_config(config_file, "OPENAI_PERSONA_SUM", _legacy(enable_legacy, default_persona_sum_legacy, default_persona_sum)),
+                                           value=_set_config(config_file, "OPENAI_PERSONA_SUM", _legacy(enable_legacy, persona_sum_legacy, persona_sum)),
                                            help='This is a pre-defined message for total summarization that is used to'
                                                 'instruct the assistant at the beginning of a conversation. ',
                                            height=300)
@@ -187,7 +178,7 @@ f"""Structured markdown summary with headings in perfect {language} (####): """
 
         if persona_rec:
             set_openai_persona(persona_rec, persona_sum)
-        _set_language(language)
+
         set_chunk_size(chunk_size)
         set_param(param)
         set_delay(delay)

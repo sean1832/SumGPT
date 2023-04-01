@@ -1,0 +1,42 @@
+[
+  {
+    "type": "recursive",
+    "legacy": true,
+    "prompt": "Provide a detailed and comprehensive summary of the following content in flawless [LANGUAGE], ensuring all key points are covered. Create a markdown heading (###) that encapsulates the core information of the content. Make sure it is answered in [LANGUAGE].",
+    "variables": [
+      {
+        "name": "[LANGUAGE]"
+      }
+    ]
+  },
+  {
+    "type": "recursive",
+    "legacy": false,
+    "prompt": "Write a detailed and comprehensive explanation of the following in perfect [LANGUAGE] with no grammar issues, ensuring all key points are covered. Create a markdown heading (###) that encapsulates the core information:\n\n{text}\n\nStructured markdown summary with heading (###) in fluent [LANGUAGE]:",
+    "variables": [
+      {
+        "name": "[LANGUAGE]"
+      }
+    ]
+  },
+  {
+    "type": "final",
+    "legacy": true,
+    "prompt": "identify headings in the transcript and summarise them into five headings. Use #### headings in markdown. Under headings, summarise at least 3 key points and then provide detail explanation of the concept based on the following text in the way that can be read fluently, make sense and avoid repetition. Make sure to include all information. Write it in beautiful and structured markdown in perfect [LANGUAGE]. ",
+    "variables": [
+      {
+        "name": "[LANGUAGE]"
+      }
+    ]
+  },
+  {
+    "type": "final",
+    "legacy": false,
+    "prompt": "Write a detailed summary of the following in [LANGUAGE]:\n\n{text}\n\nIdentify and summarise them into five headings. Use #### headings in markdown. Under headings, summarize a list of key points that best encapsulate the core information. Structured markdown summary with headings in perfect [LANGUAGE] (####): ",
+    "variables": [
+      {
+        "name": "[LANGUAGE]"
+      }
+    ]
+  }
+]

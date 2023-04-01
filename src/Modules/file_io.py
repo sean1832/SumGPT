@@ -8,12 +8,18 @@ import json
 import streamlit as st
 
 
+
 @st.cache_data()
-def read_json(file, key: str) -> Any:
+def read_json(file, key: str = None) -> Any:
     """Reads a json file and returns the value of a key."""
     with open(file, "r") as f:
         data = json.load(f)
-        return data[key]
+        if key and isinstance(data, dict):
+            return data[key]
+        elif key and isinstance(data, list):
+            return [d[key] for d in data]
+        else:
+            return data
 
 
 @st.cache_data()
