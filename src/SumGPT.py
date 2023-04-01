@@ -144,5 +144,5 @@ with result_handler:
             if finish_reason_final == 'length':
                 st.warning(
                     '⚠️Result cut off due to length. Consider increasing the [Max Tokens Summary] parameter.')
-        if final_response is not None:
+        if final_response is not None or rec_responses is not None:
             util.download_results(rec_responses, final_response)
