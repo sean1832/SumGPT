@@ -1,7 +1,7 @@
 # SumGPT
 [![python](https://img.shields.io/badge/python-3.11-blue)](https://www.python.org/downloads/release/python-3112/)
 
-Detail summarization of documents using [GPT-3.5](https://platform.openai.com/docs/models/gpt-3-5) and [GPT-4](https://platform.openai.com/docs/models/gpt-4) API from [OpenAI](https://openai.com/).
+Achieve detailed summarization of extensive documents through 🚀ultra-fast parallelized predictions, utilizing [GPT-3.5](https://platform.openai.com/docs/models/gpt-3-5) and [GPT-4](https://platform.openai.com/docs/models/gpt-4) APIs provided by [OpenAI](https://openai.com/).
 
 🌐 Web App: [https://sumgpt.streamlit.app](https://sumgpt.streamlit.app/)
 
@@ -16,6 +16,7 @@ Detail summarization of documents using [GPT-3.5](https://platform.openai.com/do
 - 📄 Summarize document (.pdf, .docx, .txt, .md).
 - 🎥 Summarize YouTube video with subtitles.
 - 🤖 Customizable parameters and bot persona for refined response generation.
+- 🚀 Facilitates parallel processing of chunks, enabling ultra-fast generation speeds.
 - 💼 Export & import configs for easy sharing and reuse.
 - 🧠 Supports GPT-3.5 and GPT-4.
 
