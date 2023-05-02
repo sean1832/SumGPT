@@ -1,12 +1,17 @@
 {
   "name": "SumGPT",
-  "version": "1.0.5",
-  "license": "MIT",
+  "version": "1.0.7",
+  "license": {
+    "type": "MIT",
+    "url": "https://github.com/sean1832/SumGPT/blob/master/LICENSE"
+  },
   "author": "Zeke Zhang",
   "homepage": "https://github.com/sean1832/SumGPT",
   "repository": {
     "type": "git",
     "url": "https://github.com/sean1832/SumGPT"
   },
-  "bugs": "https://github.com/sean1832/SumGPT/issues"
+  "bugs": {
+    "url": "https://github.com/sean1832/SumGPT/issues"
+  }
 }

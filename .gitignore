@@ -162,3 +162,4 @@ cython_debug/
 
 # test folder
 .test/
+/test/

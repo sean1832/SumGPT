@@ -42,7 +42,7 @@ def _extract_xml_caption(xml: str, is_auto_lang: bool) -> str:
         text_content = text
     return text_content.strip()
 
-@st.cache_data(show_spinner=False)
+# @st.cache_data(show_spinner=False)
 def _get_caption(url: str, lang_code: str | List[str] = 'a.en') -> str:
     """Extracts the transcript from a YouTube video."""
     attempt = 3
