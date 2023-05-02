@@ -1,8 +1,8 @@
 import asyncio
-import Components
 import streamlit as st
 
-import Components.StreamlitSetup
+import Components.StreamlitSetup as StreamlitSetup
+StreamlitSetup.setup()
 
 import Modules.Youtube
 from Components.sidebar import sidebar
