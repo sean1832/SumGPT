@@ -4,8 +4,6 @@ import asyncio
 import numpy as np
 from typing import Any, Dict, List, Tuple, Union
 
-import pytube.exceptions
-
 from GPT.embeddings import openAIEmbeddings
 import streamlit as st
 import re
@@ -13,8 +11,6 @@ import GPT
 import textwrap
 from langdetect import detect
 import time
-from pytube import YouTube
-import xml.etree.ElementTree as ET
 from datetime import datetime
 
 from langchain.chat_models import ChatOpenAI
@@ -22,70 +18,6 @@ from langchain.docstore.document import Document
 from langchain.prompts import PromptTemplate
 from langchain.chains.summarize import load_summarize_chain
 from langchain.chains import LLMChain
-
-def _is_auto_lang(lang_code: str) -> bool:
-    """Checks if the language code is an auto language."""
-    return lang_code.startswith('a.')
-
-@st.cache_data(show_spinner=False)
-def _extract_xml_caption(xml: str, is_auto_lang: bool) -> str:
-    """Extracts the text content from the <s> elements of an XML string."""
-    root = ET.fromstring(xml)
-    text_content = ''
-    if is_auto_lang:
-        for child in root.iter('s'):
-            text_content += child.text
-    else:
-        text = ''
-        for p in root.findall('.//p'):
-            text += p.text + ' '
-        text_content = text
-    return text_content.strip()
-
-# @st.cache_data(show_spinner=False)
-def _get_caption(url: str, lang_code: str | List[str] = 'a.en') -> str:
-    """Extracts the transcript from a YouTube video."""
-    attempt = 3
-    yt = YouTube(url)
-    caption = None
-    selected_lang = None
-    if not isinstance(lang_code, list):
-        lang_code = [lang_code]
-    for lang in lang_code:
-        try:
-            caption = yt.captions[lang]
-            selected_lang = lang
-        except KeyError:
-            continue  # try next language
-
-    info_display = st.empty()
-
-    if caption is None:
-        source_captions = yt.captions
-        for i in range(attempt):
-            try:
-                if source_captions == {}:
-                    info_display.error(f'❌ No captions found in this video. Please try another one.')
-                    time.sleep(1)
-            except KeyError:
-                info_display.error(f'❌ Caption language currently not supported.\n\n'
-                         f'{source_captions}\n\n'
-                         f'Please [report this issue on Here](https://github.com/sean1832/SumGPT/issues)')
-        st.stop()
-
-    else:
-        xml_caption = caption.xml_captions
-        caption_string = _extract_xml_caption(xml_caption, _is_auto_lang(selected_lang))
-
-        # check if caption parsing failed
-        if xml_caption is not None and caption_string == '':
-            st.error(f'❌ Caption parsing failed. [ url: {url}, lang: {selected_lang} ]\n\n'
-                     f'Please [report this issue on Here](https://github.com/sean1832/SumGPT/issues). '
-                     f'Make sure to copy this error message and include it in your issue.')
-            st.stop()
-
-        return caption_string
-
 
 def _similarity(v1, v2) -> np.ndarray:
     """Returns the cosine similarity between two vectors."""
@@ -148,24 +80,6 @@ def language_base(string: str) -> str:
         return 'other'
     except KeyError:
         return 'other'
-
-
-@st.cache_data(show_spinner=False)
-def extract_youtube_transcript(url: str, lang_code: str | List[str] = 'a.en') -> Tuple[str, str]:
-    """Extracts the transcript from a YouTube video."""
-    attempt = 5
-    for i in range(attempt):
-        try:
-            youtube = YouTube(url)
-            title = youtube.title
-            transcript = _get_caption(url, lang_code)
-            return transcript, title
-        except pytube.exceptions.PytubeError as e:
-            time.sleep(1)
-            print(f"Attempt {i + 1} failed with error: {str(e)}")
-
-    st.error(f'❌ Failed to fetch data from YouTube after {attempt} attempts. Please "🔃 Refresh" button to try again.')
-    st.stop()
 
 @st.cache_data(show_spinner=False)
 def convert_to_chunks(content: str, chunk_size: int = 1000, enable_embedding: bool = False) -> List[Dict[str, float]]:
