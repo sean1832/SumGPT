@@ -27,7 +27,6 @@ if not st.session_state.get('FINAL_SUMMARY_MODE'):
 
 if not st.session_state.get('CAPTION_LANGUAGES'):
     st.session_state['CAPTION_LANGUAGES'] = data.languages + data.auto_languages
-    print(st.session_state['CAPTION_LANGUAGES'])
 
 if not st.session_state.get('PREVIOUS_RESULTS'):
     st.session_state['PREVIOUS_RESULTS'] = None
