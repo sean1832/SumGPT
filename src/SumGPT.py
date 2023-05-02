@@ -1,13 +1,15 @@
 import asyncio
 import Components
 import streamlit as st
+
+import Components.StreamlitSetup
+
+import Modules.Youtube
 from Components.sidebar import sidebar
 import Modules.file_io as file_io
 import GPT
 import util
 import time
-
-Components.StreamlitSetup.setup()
 
 app_header = st.container()
 
@@ -36,7 +38,7 @@ with file_handler:
     if youtube_link:
         upload_file_emtpy.empty()
         with st.spinner("🔍 Extracting transcript..."):
-            transcript, title = util.extract_youtube_transcript(youtube_link, st.session_state['CAPTION_LANGUAGES'])
+            transcript, title = Modules.Youtube.extract_youtube_transcript(youtube_link, st.session_state['CAPTION_LANGUAGES'])
             file_content = {'name': f"{title}.txt", 'content': transcript}
     elif upload_file:
         youtube_link_empty.empty()
