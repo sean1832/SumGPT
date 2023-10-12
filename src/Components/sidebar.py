@@ -110,12 +110,14 @@ def sidebar():
                 persona_sum = ""
 
         with st.expander('🔥 Advanced Options'):
-            model_options = ['gpt-3.5-turbo', 'gpt-4']
+            model_options = ['gpt-3.5-turbo','gpt-3.5-turbo-16k', 'gpt-4']
             model_index = model_options.index(_set_config(config_file, "MODEL", 'gpt-3.5-turbo'))
             model = st.selectbox("Model", options=model_options, index=model_index)
 
             if model == 'gpt-4':
                 max_chunk = 4000
+            elif model == 'gpt-3.5-turbo-16k':
+                max_chunk = 16000
             else:
                 max_chunk = 2500
             chunk_size = st.slider('Chunk Size (word count)', min_value=0, max_value=max_chunk, step=20,
@@ -137,7 +139,7 @@ def sidebar():
                                          value=_set_config(config_file, "PRESENCE_PENALTY", 0.0))
             if st_toggle_switch(label="Delay (free openAI API user)",
                                 default_value=_set_config(config_file, "ENABLE_DELAY", False)):
-                delay = st.slider('Delay (seconds)', min_value=0, max_value=5, step=1,
+                delay = st.slider('Delay (seconds)', min_value=0, max_value=60, step=1,
                                   value=_set_config(config_file, "DELAY_TIME", 1))
             else:
                 delay = 0

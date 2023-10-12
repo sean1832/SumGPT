@@ -80,8 +80,10 @@ with result_handler:
             st.markdown('**Note:** To access GPT-4, please [join the waitlist](https://openai.com/waitlist/gpt-4-api)'
                         " if you haven't already received an invitation from OpenAI.")
             st.info("ℹ️️ Please keep in mind that GPT-4 is significantly **[more expensive](https://openai.com/pricing#language-models)** than GPT-3.5. ")
+        elif param.model == 'gpt-3.5-turbo-16k':
+            price = round(prompt_token * 0.000003 + completion_token *0.000004, 5)
         else:
-            price = round((prompt_token + completion_token) * 0.000002, 5)
+            price = round(prompt_token * 0.0000015 + completion_token * 0.000002 , 5)
         st.markdown(
             f"Price Prediction: `${price}` || Total Prompt: `{prompt_token}`, Total Completion: `{completion_token}`")
         # max tokens exceeded warning

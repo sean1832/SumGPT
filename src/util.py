@@ -225,6 +225,8 @@ def exceeded_token_handler(param, chunks) -> bool:
     """Handles the case where the user has exceeded the number of tokens."""
     if param.model == 'gpt-4':
         max_token = 8100
+    elif param.model == 'gpt-3.5-turbo-16k':
+        max_token = 16385
     else:
         max_token = 4096
     info = GPT.misc.is_tokens_exceeded(param, chunks, max_token)
