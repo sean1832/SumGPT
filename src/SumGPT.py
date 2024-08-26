@@ -6,13 +6,13 @@ import Components.StreamlitSetup as StreamlitSetup
 
 StreamlitSetup.setup()
 
-import time
+import time  # noqa: E402
 
-import GPT
-import Modules.file_io as file_io
-import Modules.Youtube
-import util
-from Components.sidebar import sidebar
+import GPT  # noqa: E402
+import Modules.file_io as file_io  # noqa: E402
+import Modules.Youtube  # noqa: E402
+import utils.helpers as helpers  # noqa: E402
+from Components.sidebar import sidebar  # noqa: E402
 
 app_header = st.container()
 
@@ -76,7 +76,7 @@ with result_handler:
         content = file_content["content"]
         if file_content["name"].endswith(".pdf"):
             content = "\n\n".join(file_content["content"])
-        chunks.extend(util.convert_to_chunks(content, chunk_size=st.session_state["CHUNK_SIZE"]))
+        chunks.extend(helpers.convert_to_chunks(content, chunk_size=st.session_state["CHUNK_SIZE"]))
 
         with st.expander(f"Chunks ({len(chunks)})"):
             for chunk in chunks:
@@ -96,7 +96,7 @@ with result_handler:
             f"Price Prediction: `${price}` || Total Prompt: `{prompt_token}`, Total Completion: `{completion_token}`"
         )
         # max tokens exceeded warning
-        exceeded = util.exceeded_token_handler(
+        exceeded = helpers.exceeded_token_handler(
             param=st.session_state["OPENAI_PARAMS"], chunks=chunks
         )
 
@@ -127,16 +127,16 @@ with result_handler:
                 with st.spinner("Summarizing... (this might take a while)"):
                     if st.session_state["LEGACY"]:
                         rec_max_token = st.session_state["OPENAI_PARAMS"].max_tokens_rec
-                        rec_responses, finish_reason_rec = util.recursive_summarize(
+                        rec_responses, finish_reason_rec = helpers.recursive_summarize(
                             chunks, rec_max_token
                         )
                         if st.session_state["FINAL_SUMMARY_MODE"]:
-                            final_response, finish_reason_final = util.summarize(rec_responses)
+                            final_response, finish_reason_final = helpers.summarize(rec_responses)
                         else:
                             final_response = None
                     else:
                         completions, final_response = asyncio.run(
-                            util.summarize_experimental_concurrently(
+                            helpers.summarize_experimental_concurrently(
                                 content, st.session_state["CHUNK_SIZE"]
                             )
                         )
@@ -175,4 +175,4 @@ with result_handler:
                     "⚠️Result cut off due to length. Consider increasing the [Max Tokens Summary] parameter."
                 )
         if final_response is not None or rec_responses is not None:
-            util.download_results(rec_responses, final_response)
+            helpers.download_results(rec_responses, final_response)
