@@ -63,6 +63,11 @@ class BodyHandler:
         generate_button = st.button(
             "🚀 Run",
         )
+        total_chunks = len(chunks)
+        progress_text = st.empty()
+
+        total_price_text = st.empty()
+
         if generate_button:
             if not api_key:
                 st.error("❌ Please enter your OpenAI API key in the sidebar.")
@@ -75,14 +80,10 @@ class BodyHandler:
 
             async def process_chunks():
                 llm = LLM(api_key, gpt_params)
-                total_chunks = len(chunks)
-                progress_text = st.empty()
-                progress_text.write(f"Generating summaries 0/{total_chunks}")
-                total_price_text = st.empty()
                 total_price = 0
-
                 progress_bar = st.progress(0)
                 completed_chunks = 0
+                progress_text.write(f"Generating summaries 0/{total_chunks}")
 
                 # Sort chunks by chunk.id
                 sorted_chunks = sorted(chunks, key=lambda c: c.id)
@@ -179,7 +180,36 @@ class BodyHandler:
                                     f"Tokens: `{summary_data['tokens']}`, price: `${summary_data['price']}`"
                                 )
                                 total_price += summary_data["price"]
-                st.write(f"Total price: `${round(total_price, 6)}`")
+                total_price_text.write(f"Total price: `${round(total_price, 6)}`")
+
+    def download_summaries(self):
+        if "summaries" in st.session_state:
+            summaries = st.session_state["summaries"]
+            if not summaries:
+                return
+            st.download_button(
+                "📥 Download summaries",
+                self._serialize_summaries(summaries),
+                "summaries.md",
+                mime="application/markdown",
+            )
+
+    def _serialize_summaries(self, summaries):
+        markdown = ""
+
+        markdown_by_filename = {}
+        for summary in summaries:
+            filename = summary["filename"]
+            if filename not in markdown_by_filename:
+                markdown_by_filename[filename] = []
+            markdown_by_filename[filename].append(summary["content"])
+
+        for filename, content in markdown_by_filename.items():
+            markdown += f"# {filename}\n"
+            markdown += "\n\n".join(content)
+            markdown += "\n\n"
+
+        return markdown
 
     def _serialize_config(self, api_key, role, model, chunk_size, max_tokens, temperature):
         return {

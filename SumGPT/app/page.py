@@ -72,3 +72,4 @@ class Page:
                 total_chunks.extend(chunks)
 
         body.agenerate(total_chunks, self.llm_params, self.role, self.api_key, self.chunk_size)
+        body.download_summaries()
