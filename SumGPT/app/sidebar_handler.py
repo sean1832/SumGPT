@@ -18,6 +18,9 @@ class SidebarHandler:
 
         self.chunk_size = None
 
+    def get_config(self) -> Dict[str, Any]:
+        return self.config
+
     def _set_config_from_cookie(self):
         config_binary = self.cookie_controller.get("config")
         if config_binary:
@@ -44,15 +47,17 @@ class SidebarHandler:
         return api_key
 
     def role_settings_panel(self, height=300) -> str:
+        language_list = ["English", "Chinese", "Japanese", "Spanish", "French", "German", "Italian"]
         language = st.selectbox(
             "Role language",
-            ["English", "Chinese", "Japanese", "Spanish", "French", "German", "Italian"],
+            language_list,
+            language_list.index(self.config.get("role_language", "English")),
         )
         role = st.text_area(
             "Role settings",
             self.config.get(
                 "role",
-                f"Write a detailed summary in perfect {language} that is concise, clear and coherent while capturing the main ideas the text. "
+                "Write a detailed summary in perfect $(LANGUAGE) that is concise, clear and coherent while capturing the main ideas the text. "
                 "The summary should be well-structured and free of grammatical errors.\n\n"
                 "The summary is to be written in markdown format, with a heading (###) that encapsulate the core concept of the content. It should be concise and specific. avoid generic headings like 'Summary' or 'Introduction'.",
             ),
@@ -62,7 +67,10 @@ class SidebarHandler:
             st.stop()
             st.warning("Role settings are not set.")
 
+        self.config["role_language"] = language
         self.config["role"] = role
+
+        role = role.replace("$(LANGUAGE)", language)
         return role
 
     def config_control_panel(self, models_data: List[Dict[str, str]]) -> Tuple[LLMParams, int]:

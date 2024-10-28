@@ -13,6 +13,7 @@ class Page:
         self.role: Optional[str] = None
         self.api_key: Optional[str] = None
         self.llm_params: Optional[LLMParams] = None
+        self.config: Dict[str, str] = {}
 
     def draw_header(self, version):
         st.title(f"📝 SumGPT {version}")
@@ -39,6 +40,7 @@ class Page:
             with cols[1]:
                 sb.export_config()
             sb.footer(manifest)
+            self.config = sb.get_config()
 
     def draw_body(self) -> None:
         if not self.chunk_size:
@@ -71,5 +73,5 @@ class Page:
 
                 total_chunks.extend(chunks)
 
-        body.agenerate(total_chunks, self.llm_params, self.role, self.api_key, self.chunk_size)
+        body.agenerate(total_chunks, self.llm_params, self.role, self.api_key, self.config)
         body.download_summaries()

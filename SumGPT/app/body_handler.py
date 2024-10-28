@@ -58,7 +58,7 @@ class BodyHandler:
         gpt_params: LLMParams,
         role: str,
         api_key: Optional[str],
-        chunk_size: int,
+        config: Dict[str, Any],
     ) -> None:
         generate_button = st.button(
             "🚀 Run",
@@ -142,20 +142,12 @@ class BodyHandler:
 
             # Run the async processing
             asyncio.run(process_chunks())
-            config = self._serialize_config(
-                api_key,
-                role,
-                gpt_params.model.name,
-                chunk_size,
-                gpt_params.max_tokens,
-                gpt_params.temperature,
-            )
             crypto: Crypto = st.session_state["crypto"]
-            config = crypto.encrypt_b64(json.dumps(config))
+            config_binary = crypto.encrypt_b64(json.dumps(config))
             controler = CookieController()
             controler.set(
                 "config",
-                config,
+                config_binary,
                 expires=datetime.datetime.now() + datetime.timedelta(days=30),
             )
         else:
@@ -210,13 +202,3 @@ class BodyHandler:
             markdown += "\n\n"
 
         return markdown
-
-    def _serialize_config(self, api_key, role, model, chunk_size, max_tokens, temperature):
-        return {
-            "api_key": api_key,
-            "role": role,
-            "model": model,
-            "chunk_size": chunk_size,
-            "max_tokens": max_tokens,
-            "temperature": temperature,
-        }
