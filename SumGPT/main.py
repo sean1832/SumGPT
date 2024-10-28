@@ -1,5 +1,13 @@
+import streamlit as st
 from app.page import Page
 from utils import io
+
+
+def init():
+    st.set_page_config("SumGPT", "📝", "wide")
+
+    if "summaries" not in st.session_state:
+        st.session_state["summaries"] = []
 
 
 def main():
@@ -13,4 +21,5 @@ def main():
 
 
 if __name__ == "__main__":
+    init()
     main()
