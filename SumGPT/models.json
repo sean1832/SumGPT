@@ -1,0 +1,40 @@
+[
+	{
+		"model": "gpt-4o-mini",
+		"context_window": 128000,
+		"max_output_tokens": 16384,
+		"pricing": {
+			"input": 0.15,
+			"output": 0.6,
+			"cached": 0.075
+		}
+	},
+	{
+		"model": "gpt-4o",
+		"context_window": 128000,
+		"max_output_tokens": 4096,
+		"pricing": {
+			"input": 2.5,
+			"output": 10,
+			"cached": 1.25
+		}
+	},
+	{
+		"model": "gpt-4-turbo",
+		"context_window": 128000,
+		"max_output_tokens": 4096,
+		"pricing": {
+			"input": 10,
+			"output": 30
+		}
+	},
+	{
+		"model": "gpt-3.5-turbo",
+		"context_window": 16385,
+		"max_output_tokens": 4096,
+		"pricing": {
+			"input": 0.5,
+			"output": 1.5
+		}
+	}
+]

@@ -38,4 +38,4 @@ if "%mod_date%" neq "%last_mod_date%" (
   echo "Requirements file has not been modified. Skipping update."
 )
 
-streamlit run src/SumGPT.py
+streamlit run SumGPT/main.py

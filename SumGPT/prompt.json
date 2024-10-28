@@ -1,0 +1,22 @@
+[
+  {
+    "type": "recursive",
+    "legacy": false,
+    "prompt": "Write a detailed and comprehensive explanation of the following in perfect [LANGUAGE] with no grammar issues, ensuring all key points are covered. Create a markdown heading (###) that encapsulates the core information:\n\n{text}\n\nStructured markdown summary with heading (###) in fluent [LANGUAGE]:",
+    "variables": [
+      {
+        "name": "[LANGUAGE]"
+      }
+    ]
+  },
+  {
+    "type": "final",
+    "legacy": false,
+    "prompt": "Write a detailed summary of the following in [LANGUAGE]:\n\n{text}\n\nIdentify and summarise them into five headings. Use #### headings in markdown. Under headings, summarize a list of key points that best encapsulate the core information. Structured markdown summary with headings in perfect [LANGUAGE] (####): ",
+    "variables": [
+      {
+        "name": "[LANGUAGE]"
+      }
+    ]
+  }
+]
