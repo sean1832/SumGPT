@@ -28,13 +28,17 @@ class SidebarHandler:
                 self.cookie_controller.remove("config")  # Remove invalid cookie
 
     def header(self):
-        st.title("SumGPT")
-        st.markdown("Select the model and parameters for summarization.")
+        st.markdown("### How to use:")
+        st.markdown(
+            "1. 🔑 Enter your [OpenAI API Key](https://beta.openai.com/account/api-keys)\n"
+            "2. 📁 Upload your file\n"
+            "3. 🚀 Run"
+        )
+        st.markdown("---")
 
     def api_key_entry(self) -> str | None:
-        st.markdown("### API Key")
         api_key = st.text_input(
-            "Enter your OpenAI API key", type="password", value=self.config.get("api_key", "")
+            "🔑 OpenAI API key", type="password", value=self.config.get("api_key", "")
         )
         self.config["api_key"] = api_key
         return api_key
@@ -111,20 +115,24 @@ class SidebarHandler:
         return param
 
     def import_config(self):
-        st.markdown("### Import Configuration")
-        config_file = st.file_uploader("Upload configuration file", type=["json"])
+        config_file = st.file_uploader("📁 Import Config", type=["json"])
         if config_file:
             config = json.load(config_file)
             self.config = config
             self.cookie_controller.set("config", self.crypto.encrypt_b64(json.dumps(config)))
 
     def export_config(self):
-        st.markdown("### Export Configuration")
         st.download_button(
-            "Export configuration",
+            "Export Config",
             data=json.dumps(self.config, indent=2),
             file_name="sumgpt_config.json",
         )
+
+    def delete_cookie(self):
+        if st.button("Delete cookie"):
+            self.cookie_controller.remove("config")
+            self.config = {}
+            st.rerun()
 
     def footer(self, data: Dict[str, Any]):
         st.markdown("---")

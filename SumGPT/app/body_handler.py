@@ -15,7 +15,9 @@ from streamlit_cookies_controller import CookieController
 
 class BodyHandler:
     def file_uploader(self, type: List[str] = ["txt"]) -> List[Dict[str, str]]:
-        uploaded_files = st.file_uploader("Upload a file", type=type, accept_multiple_files=True)
+        uploaded_files = st.file_uploader(
+            "📁 Upload your files", type=type, accept_multiple_files=True
+        )
         files = []
         if uploaded_files is None:
             st.stop()
@@ -50,92 +52,6 @@ class BodyHandler:
         )
         return completion_tokens, prompt_tokens, cached_tokens
 
-    def generate(
-        self,
-        chunks: List[Chunk],
-        gpt_params: LLMParams,
-        role: str,
-        api_key: Optional[str],
-    ) -> None:
-        generate_button = st.button("Generate summary")
-        if generate_button:
-            if not api_key:
-                st.error("❌ Please enter your OpenAI API key in the sidebar.")
-                return
-            if not role:
-                st.error("❌ Please enter a role description in the sidebar.")
-                return
-
-            st.session_state["summaries"] = []  # Initialize or reset summaries
-
-            progress_text = st.empty()
-            progress_bar = st.progress(0)
-            total_chunks = len(chunks)
-
-            # Group chunks by filename
-            filename_chunks = {}
-            for chunk in chunks:
-                if chunk.filename not in filename_chunks:
-                    filename_chunks[chunk.filename] = []
-                filename_chunks[chunk.filename].append(chunk)
-
-            llm = LLM(api_key, gpt_params)
-            processed_chunks = 0
-
-            # Process chunks by filename
-            for filename, file_chunks in filename_chunks.items():
-                expander = st.expander(f"{filename}")
-                for chunk in file_chunks:
-                    processed_chunks += 1
-                    progress_text.write(f"Generating summaries {processed_chunks}/{total_chunks}")
-                    progress_bar.progress(processed_chunks / total_chunks)
-
-                    summary = llm.generate(chunk.content, role)
-                    with expander:
-                        with st.chat_message("🤖"):
-                            st.write(summary.content)
-                            completion_tokens, prompt_tokens, cached_tokens = self._get_tokens(
-                                summary.response_metadata
-                            )
-                            price = round(
-                                llm.Calc_price(prompt_tokens, completion_tokens, cached_tokens), 6
-                            )
-                            st.write(
-                                f"Tokens: `{completion_tokens + prompt_tokens}`, price: `${price}`"
-                            )
-                    # Store the summary in session state
-                    st.session_state["summaries"].append(
-                        {
-                            "filename": filename,
-                            "content": summary.content,
-                            "tokens": completion_tokens + prompt_tokens,
-                            "price": price,
-                        }
-                    )
-
-            progress_text.write("✅ All chunks processed!")
-            progress_bar.progress(1.0)
-        else:
-            # Check if summaries exist in session state and display them
-            if "summaries" in st.session_state:
-                # Group summaries by filename
-                filename_summaries = {}
-                for summary_data in st.session_state["summaries"]:
-                    filename = summary_data["filename"]
-                    if filename not in filename_summaries:
-                        filename_summaries[filename] = []
-                    filename_summaries[filename].append(summary_data)
-
-                # Display summaries grouped by filename
-                for filename, summaries in filename_summaries.items():
-                    with st.expander(f"{filename}"):
-                        for summary_data in summaries:
-                            with st.chat_message("🤖"):
-                                st.write(summary_data["content"])
-                                st.write(
-                                    f"Tokens: `{summary_data['tokens']}`, price: `${summary_data['price']}`"
-                                )
-
     def agenerate(
         self,
         chunks: List[Chunk],
@@ -144,7 +60,9 @@ class BodyHandler:
         api_key: Optional[str],
         chunk_size: int,
     ) -> None:
-        generate_button = st.button("Generate summary")
+        generate_button = st.button(
+            "🚀 Run",
+        )
         if generate_button:
             if not api_key:
                 st.error("❌ Please enter your OpenAI API key in the sidebar.")

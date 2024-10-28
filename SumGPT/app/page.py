@@ -28,11 +28,16 @@ class Page:
             sb.header()
             sb.import_config()
             self.api_key = sb.api_key_entry()
-            with st.expander("Role settings"):
+            with st.expander("🤖 Role settings"):
                 self.role = sb.role_settings_panel()
-            with st.expander("Configuration"):
+            with st.expander("⚙️ Configuration"):
                 self.llm_params, self.chunk_size = sb.config_control_panel(models_data)
-            sb.export_config()
+
+            cols = st.columns([1, 1])
+            with cols[0]:
+                sb.delete_cookie()
+            with cols[1]:
+                sb.export_config()
             sb.footer(manifest)
 
     def draw_body(self) -> None:
