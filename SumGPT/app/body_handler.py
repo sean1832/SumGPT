@@ -1,12 +1,16 @@
 import asyncio
+import datetime
+import json
 from typing import Any, Dict, List, Optional, Tuple
 
 import streamlit as st
 import utils.io as io
+from core.crypto import Crypto
 from core.llm import LLM
 from core.tokenizer import Tokenizer
 from datamodel.chunk import Chunk
 from datamodel.llm_params import LLMParams
+from streamlit_cookies_controller import CookieController
 
 
 class BodyHandler:
@@ -138,6 +142,7 @@ class BodyHandler:
         gpt_params: LLMParams,
         role: str,
         api_key: Optional[str],
+        chunk_size: int,
     ) -> None:
         generate_button = st.button("Generate summary")
         if generate_button:
@@ -218,6 +223,22 @@ class BodyHandler:
 
             # Run the async processing
             asyncio.run(process_chunks())
+            config = self._serialize_config(
+                api_key,
+                role,
+                gpt_params.model.name,
+                chunk_size,
+                gpt_params.max_tokens,
+                gpt_params.temperature,
+            )
+            crypto: Crypto = st.session_state["crypto"]
+            config = crypto.encrypt_b64(json.dumps(config))
+            controler = CookieController()
+            controler.set(
+                "config",
+                config,
+                expires=datetime.datetime.now() + datetime.timedelta(days=30),
+            )
         else:
             # Check if summaries exist in session state and display them
             if "summaries" in st.session_state:
@@ -241,3 +262,13 @@ class BodyHandler:
                                 )
                                 total_price += summary_data["price"]
                 st.write(f"Total price: `${round(total_price, 6)}`")
+
+    def _serialize_config(self, api_key, role, model, chunk_size, max_tokens, temperature):
+        return {
+            "api_key": api_key,
+            "role": role,
+            "model": model,
+            "chunk_size": chunk_size,
+            "max_tokens": max_tokens,
+            "temperature": temperature,
+        }

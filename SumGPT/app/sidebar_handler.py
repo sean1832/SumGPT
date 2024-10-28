@@ -1,22 +1,43 @@
+import json
 from typing import Any, Dict, List, Tuple
 
 import streamlit as st
 import utils.helpers as helpers
+from core.crypto import Crypto
 from datamodel.llm_params import LLMModel, LLMParams
+from streamlit_cookies_controller import CookieController
 
 
 class SidebarHandler:
     def __init__(self):
+        self.cookie_controller = CookieController()
+        self.crypto: Crypto = st.session_state["crypto"]
         self.config = {}
+        if self.config == {}:
+            self._set_config_from_cookie()
+
         self.chunk_size = None
+
+    def _set_config_from_cookie(self):
+        config_binary = self.cookie_controller.get("config")
+        if config_binary:
+            try:
+                self.config = json.loads(self.crypto.decrypt_b64(config_binary))
+            except TypeError:
+                self.config = {}
+                self.cookie_controller.remove("config")  # Remove invalid cookie
 
     def header(self):
         st.title("SumGPT")
         st.markdown("Select the model and parameters for summarization.")
 
-    def api_key_entry(self) -> str:
+    def api_key_entry(self) -> str | None:
         st.markdown("### API Key")
-        return st.text_input("Enter your OpenAI API key", type="password")
+        api_key = st.text_input(
+            "Enter your OpenAI API key", type="password", value=self.config.get("api_key", "")
+        )
+        self.config["api_key"] = api_key
+        return api_key
 
     def role_settings_panel(self, height=300) -> str:
         language = st.selectbox(
@@ -36,12 +57,15 @@ class SidebarHandler:
         if role is None:
             st.stop()
             st.warning("Role settings are not set.")
+
+        self.config["role"] = role
         return role
 
     def config_control_panel(self, models_data: List[Dict[str, str]]) -> Tuple[LLMParams, int]:
         model_names = helpers.extract_values(models_data, "model")
         model_name = st.selectbox("Model", model_names, self.config.get("model_index", 0))
         model = LLMModel.construct_from_dict(self._get_model_dict(models_data, model_name))
+        self.config["model"] = model_name
 
         _param = self._construct_param(models_data, model_name)
 
@@ -52,13 +76,19 @@ class SidebarHandler:
             self.config.get("chunk_size", 2048),
             step=1024,
         )
+        self.config["chunk_size"] = chunk_size
+
         max_tokens: int = st.number_input(
             "Max output (tokens)",
             32,
             _param["max_output_tokens"],
             self.config.get("max_tokens", 512),
         )
+        self.config["max_tokens"] = max_tokens
+
         temperature: float = st.slider("Temperature", 0.0, 1.0, self.config.get("temperature", 0.7))
+        self.config["temperature"] = temperature
+
         return (
             LLMParams(
                 model=model,
@@ -82,13 +112,19 @@ class SidebarHandler:
 
     def import_config(self):
         st.markdown("### Import Configuration")
-        if st.button("Import configuration"):
-            raise NotImplementedError  # TODO: implement
+        config_file = st.file_uploader("Upload configuration file", type=["json"])
+        if config_file:
+            config = json.load(config_file)
+            self.config = config
+            self.cookie_controller.set("config", self.crypto.encrypt_b64(json.dumps(config)))
 
     def export_config(self):
         st.markdown("### Export Configuration")
-        if st.button("Export configuration"):
-            raise NotImplementedError  # TODO: implement
+        st.download_button(
+            "Export configuration",
+            data=json.dumps(self.config, indent=2),
+            file_name="sumgpt_config.json",
+        )
 
     def footer(self, data: Dict[str, Any]):
         st.markdown("---")

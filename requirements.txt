@@ -1,9 +1,10 @@
 docx==0.2.4
 python_docx==1.1.2
-langdetect==1.0.9
 PyPDF4==1.27.0
 tiktoken==0.8.0
-requests==2.32.3
+
+# crypto
+cryptography==43.0.3
 
 # langchain
 langchain==0.3.4
@@ -11,4 +12,4 @@ langchain-openai==0.2.3
 
 # streamlit
 streamlit==1.39.0
-
+streamlit-cookies-controller==0.0.4

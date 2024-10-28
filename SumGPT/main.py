@@ -1,5 +1,6 @@
 import streamlit as st
 from app.page import Page
+from core.crypto import Crypto
 from utils import io
 
 
@@ -8,6 +9,8 @@ def init():
 
     if "summaries" not in st.session_state:
         st.session_state["summaries"] = []
+    if "crypto" not in st.session_state:
+        st.session_state["crypto"] = Crypto(st.secrets["crypto_key"])
 
 
 def main():
