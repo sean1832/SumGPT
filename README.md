@@ -1,6 +1,8 @@
 # SumGPT
 [![python](https://img.shields.io/badge/python-3.11-blue)](https://www.python.org/downloads/release/python-3112/)
 
+<a href="https://www.buymeacoffee.com/zekezhang" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-blue.png" alt="Buy Me A Coffee" style="height: 40px !important;width: 145px !important;" ></a>
+
 Achieve detailed summarization of extensive documents through 🚀ultra-fast parallelized completion with APIs provided by [OpenAI](https://openai.com/).
 
 🌐 Web App: [https://sumgpt.streamlit.app](https://sumgpt.streamlit.app/)
