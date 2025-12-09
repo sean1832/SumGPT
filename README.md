@@ -3,12 +3,12 @@
 
 <a href="https://www.buymeacoffee.com/zekezhang" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-blue.png" alt="Buy Me A Coffee" style="height: 40px !important;width: 145px !important;" ></a>
 
-Achieve detailed summarization of extensive documents through 🚀ultra-fast parallelized completion with APIs provided by [OpenAI](https://openai.com/).
+Achieve detailed summarisation of extensive documents through 🚀ultra-fast parallelised completion with APIs provided by [OpenAI](https://openai.com/).
 
 🌐 Web App: [https://sumgpt.streamlit.app](https://sumgpt.streamlit.app/)
 
 ---
-*⭐️ Like this repo? please consider a star!*
+*⭐️ Like this repo? Please consider a star!*
 
 *💡As I am not a professional programmer and am fairly new to Python, this project may contain bugs. If you encounter any issues, please suggest them in the [Issues section](https://github.com/sean1832/SumGPT/issues).*
 
@@ -20,7 +20,7 @@ Achieve detailed summarization of extensive documents through 🚀ultra-fast par
 - 🚀 Facilitates parallel processing of chunks.
 - 💼 Export & import configs for easy sharing and reuse.
 - 🌍 Encrypted browser cookies ensure configuration settings are preserved across sessions.
-- 🧠 Supports multiple modles:
+- 🧠 Supports multiple models:
     - `gpt-4o-mini`
     - `gpt-4o`
     - `gpt-4-turbo`
@@ -40,7 +40,7 @@ cd SumGPT
 2. Create a `secrets.toml` file under `.streamlit\` directory. Replace `your_secure_key` with your own password for browser cookie encryption.
 ```bash
 mkdir .streamlit
-echo "crypto_keycrypto_key = 'your_secure_key'" > .streamlit/secrets.toml
+echo "crypto_key = 'your_secure_key'" > .streamlit/secrets.toml
 ```
 
 3. Execute `RUN.bat`
